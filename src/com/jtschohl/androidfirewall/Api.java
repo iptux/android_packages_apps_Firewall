@@ -157,36 +157,16 @@ public final class Api {
 			"# Try to find iptables\n" +
 			"if " + myiptables + " --version >/dev/null 2>/dev/null ; then\n" +
 			"	IPTABLES="+myiptables+"\n" +
+			"elif iptables --version >/dev/null 2>/dev/null ; then\n" +
+			"	IPTABLES=iptables\n" +
+			"elif /system/xbin/iptables --version >/dev/null 2>/dev/null ; then\n" +
+			"	IPTABLES=/system/xbin/iptables\n" +
+			"elif /system/bin/iptables --version >/dev/null 2>/dev/null ; then\n" +
+			"	IPTABLES=/system/bin/iptables\n" +
 			"fi\n" +
 			"";
 	}
 	
-	
-	/**
-	 * Copies a raw resource file, given its ID to the given location
-	 * @param ctx context
-	 * @param resid resource id
-	 * @param file destination file
-	 * @param mode file permissions (E.g.: "755")
-	 * @throws IOException on error
-	 * @throws InterruptedException when interrupted
-	 */
-	private static void copyRawFile(Context ctx, int resid, File file, String mode) throws IOException, InterruptedException
-	{
-		final String abspath = file.getAbsolutePath();
-		// Write the iptables binary
-		final FileOutputStream out = new FileOutputStream(file);
-		final InputStream is = ctx.getResources().openRawResource(resid);
-		byte buf[] = new byte[1024];
-		int len;
-		while ((len = is.read(buf)) > 0) {
-			out.write(buf, 0, len);
-		}
-		out.close();
-		is.close();
-		// Change the permissions
-		Runtime.getRuntime().exec("chmod "+mode+" "+abspath).waitFor();
-	}
     /**
      * Purge and re-add all rules (internal implementation).
      * @param ctx application context (mandatory)
@@ -1140,27 +1120,6 @@ public final class Api {
 	 * @return false if the binary files could not be installed
 	 */
 	public static boolean assertBinaries(Context ctx, boolean showErrors) {
-		boolean changed = false;
-		try {
-			// Check iptables_armv5
-			File file = new File(ctx.getDir("bin",0), "iptables_armv5");
-			if (!file.exists() || file.length()!=198652) {
-				copyRawFile(ctx, R.raw.iptables_armv5, file, "755");
-				changed = true;
-			}
-			// Check busybox
-			file = new File(ctx.getDir("bin",0), "busybox_g1");
-			if (!file.exists()) {
-				copyRawFile(ctx, R.raw.busybox_g1, file, "755");
-				changed = true;
-			}
-			if (changed) {
-				Toast.makeText(ctx, R.string.toast_bin_installed, Toast.LENGTH_LONG).show();
-			}
-		} catch (Exception e) {
-			if (showErrors) alert(ctx, "Error installing binary files: " + e);
-			return false;
-		}
 		return true;
 	}
 	/**
