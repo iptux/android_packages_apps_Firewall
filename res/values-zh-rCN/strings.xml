@@ -97,8 +97,8 @@
 	<string name="exportfailed">导出失败！</string>
 	<string name="exportsuccess">到处成功！</string>
 	<string name="enterfilename">请输入文件名</string>
-	<string name="notify_enabled">启用通知</string>
-    <string name="notify_disabled">禁用通知</string>
+	<string name="notify_enabled">通知已启用</string>
+    <string name="notify_disabled">通知已禁用</string>
     <string name="notify_was_enabled">已启用通知</string>
     <string name="notify_was_disabled">已禁用通知</string>
     <string name="managerulefiles">管理规则文件</string>
