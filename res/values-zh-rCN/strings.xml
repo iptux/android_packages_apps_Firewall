@@ -102,4 +102,9 @@
     <string name="notify_was_enabled">已启用通知</string>
     <string name="notify_was_disabled">已禁用通知</string>
     <string name="managerulefiles">管理规则文件</string>
+    <string name="wifi">无线网络</string>
+    <string name="data">数据</string>
+    <string name="roaming">漫游</string>
+    <string name="clear">清除</string>
 </resources>
+
