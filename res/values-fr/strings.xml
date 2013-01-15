@@ -96,7 +96,7 @@
 	<string name="exportfailed">Échec de l\'exportation !</string>
 	<string name="exportsuccess">Exporter avec succès !</string>
 	<string name="enterfilename">Entrer le nom du fichier</string>
-	<string name="new_app_installed">Nouvelle application installée demande l'accès aux données</string>
+	<string name="new_app_installed">Nouvelle application installée demande l\'accès aux données</string>
 	<string name="notify_enabled">Notifications activées</string>
     <string name="notify_disabled">Notifications désactivées</string>
     <string name="notify_was_enabled">Les notifications ont été activés</string>
