@@ -13,7 +13,7 @@
     <string name="help">Help</string>
     <string name="close">Close</string>
     <string name="exit">Exit</string>
-    <string name="fw_enabled">Firewall enabled</string>
+    <string name="fw_enabled">Enable Firewall</string>
     <string name="fw_disabled">Firewall disabled</string>
     <string name="ipv6_enabled">IPv6 enabled</string>
     <string name="ipv6_disabled">IPv6 disabled</string>
@@ -109,5 +109,20 @@
     <string name="profile5">Profile 5</string>
     <string name="pleasechoose">Please choose the profile you want to create or modify</string>
     <string name="saveprofile">Create Profile</string>
+    <string name="defaultsaved">The Default profile was saved successfully!</string>
+    <string name="profile1saved">Profile 1 was saved successfully</string>
+    <string name="profile2saved">Profile 2 was saved successfully</string>
+    <string name="profile3saved">Profile 3 was saved successfully</string>
+    <string name="profile4saved">Profile 4 was saved successfully</string>
+    <string name="profile5saved">Profile 5 was saved successfully</string>
+    <string name="profileselect">Please choose which profile you want to apply</string>
+    <string name="profileapplied">The profile was successfully applied</string>
+    <string name="loadprofile">Load Profile</string>
+    <string name="rulesoptions">Rules Management</string>
+    <string name="profilesoptions">Profile Management</string>
+    <string name="ipv6_title">IPv6 Support</string>
+    <string name="notifications_title">Notification Support</string>
+    <string name="enableLog_title">Enable Firewall Log</string>
+    <string name="invert">Invert</string>
 
 </resources>
