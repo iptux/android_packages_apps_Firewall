@@ -124,7 +124,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 		spinner.setSelection(prefs.getInt("itemPosition", 0));
-
 		spinner.post(new Runnable() {
 			public void run() {
 				spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -441,7 +440,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 							.findViewById(R.id.itemtext);
 					entry.icon = (ImageView) convertView
 							.findViewById(R.id.itemicon);
-
 					entry.box_wifi
 							.setOnCheckedChangeListener(MainActivity.this);
 					entry.box_3g.setOnCheckedChangeListener(MainActivity.this);
@@ -457,7 +455,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 							.findViewById(R.id.itemcheck_3g);
 					entry.box_roaming = (CheckBox) convertView
 							.findViewById(R.id.itemcheck_roam);
-
 				}
 				final DroidApp app = apps[position];
 				entry.app = app;
@@ -727,18 +724,13 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 	public void exportRules() {
 		Intent intent = new Intent();
 		intent.setClass(this, ExportRulesDialog.class);
-		// boolean mExternalStorageAvailable = false;
-		// boolean mExternalStorageWriteable = false;
 		String state = Environment.getExternalStorageState();
 
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
 			// We can read and write the media
-			// mExternalStorageAvailable = mExternalStorageWriteable = true;
 			startActivityForResult(intent, EXPORT_RULES_REQUEST);
 		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
 			// We can only read the media
-			// mExternalStorageAvailable = true;
-			// mExternalStorageWriteable = false;
 			Toast.makeText(
 					this,
 					"There is an error accessing the androidfirewall directory. Please check that your SDcard is mounted or external storage is accessible.",
@@ -747,7 +739,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			// Something else is wrong. It may be one of many other states, but
 			// all we need
 			// to know is we can neither read nor write
-			// mExternalStorageAvailable = mExternalStorageWriteable = false;
 			Toast.makeText(
 					this,
 					"There is an error accessing the androidfirewall directory. Please check that your SDcard is mounted or external storage is accessible.",
@@ -1117,6 +1108,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 		for (int item = 0; item < count; item++) {
 			DroidApp app = (DroidApp) adapter.getItem(item);
 			app.selected_3g = true;
+			this.dirty = true;
 		}
 		adapter.notifyDataSetChanged();
 	}
@@ -1127,6 +1119,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 		for (int item = 0; item < count; item++) {
 			DroidApp app = (DroidApp) adapter.getItem(item);
 			app.selected_roaming = true;
+			this.dirty = true;
 		}
 		adapter.notifyDataSetChanged();
 	}
@@ -1137,6 +1130,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 		for (int item = 0; item < count; item++) {
 			DroidApp app = (DroidApp) adapter.getItem(item);
 			app.selected_wifi = true;
+			this.dirty = true;
 		}
 		adapter.notifyDataSetChanged();
 	}
@@ -1149,6 +1143,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			app.selected_wifi = false;
 			app.selected_roaming = false;
 			app.selected_3g = false;
+			this.dirty = true;
 		}
 		adapter.notifyDataSetChanged();
 	}
@@ -1159,8 +1154,8 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 		for (int item = 0; item < count; item++) {
 			DroidApp app = (DroidApp) adapter.getItem(item);
 			app.selected_3g = !app.selected_3g;
-			app.selected_roaming = !app.selected_roaming;
 			app.selected_wifi = !app.selected_wifi;
+			this.dirty = true;
 		}
 		adapter.notifyDataSetChanged();
 	}
