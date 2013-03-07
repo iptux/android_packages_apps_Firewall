@@ -47,7 +47,7 @@
     <string name="toast_bin_installed">Android Firewall: تم تنصيب الملفات الثنائية!</string>
     <string name="toast_error_enabling">"Android Firewall: خطأ بتفعيل الجدار الناري!"</string>
     <string name="help_dialog_text"><i>المبرمج: Rodrigo Zechin Rosauro and updated by Jason Tschohl</i>		\n<i><a href="http://github.com/skullone/android_firewall">http://github.com/skullone/android_firewall</a></i>		\n
-		\n<i>Android Firewall - جدار ناري للاندرويد</i> هو واجهة أمامية لميزة <b>iptables</b> الجدار الناري لنظام لينوكس.
+		\n<i>Android Firewall v2.1.3- جدار ناري للاندرويد</i> هو واجهة أمامية لميزة <b>iptables</b> الجدار الناري لنظام لينوكس.
 		حيث يتيح لك التحكم بأي برنامج ترغب بالسماح له بالوصول للشبكة.
 		\nوهو الخيار الأمثل في حال كان لديك اشتراك انترنت محدود التحميل أو ترغب بزيادة عمر البطارية.
 		\n
@@ -107,9 +107,24 @@
     <string name="notifications_title"> دعم الإشعار</string>
     <string name="enableLog_title"> تمكين سجل جدار الحماية</string>
     <string name="invert">قلب</string>
-    <string name="vpnsupport">الدعم VPN</string>
-    <string name="vpn_was_enabled">تم تمكين VPN الدعم</string>
-    <string name="vpn_was_disabled">تم تعطيل VPN الدعم</string>
-    <string name="vpn_title">VPN</string>
-
+    <string name="twofortyfouram_locale_breadcrumb_format">%1$s%2$s%3$s</string>
+    <string name="twofortyfouram_locale_breadcrumb_separator">" | "</string>
+    <string name="twofortyfouram_locale_menu_dontsave">Cancel</string>
+    <string name="twofortyfouram_locale_menu_help">Help</string>
+    <string name="twofortyfouram_locale_menu_save">Done</string>
+    <string name="tasker_name">Android Firewall - Tasker</string>
+    <string name="tasker_profile">Tasker has changed Android Firewall to the Default Profile</string>
+    <string name="tasker_profile1">Tasker has changed Android Firewall to Profile 1</string>
+    <string name="tasker_profile2">Tasker has changed Android Firewall to Profile 2</string>
+    <string name="tasker_profile3">Tasker has changed Android Firewall to Profile 3</string>
+    <string name="tasker_profile4">Tasker has changed Android Firewall to Profile 4</string>
+    <string name="tasker_profile5">Tasker has changed Android Firewall to Profile 5</string>
+    <string name="tasker_profile_disabled">Android Firewall profiles changed by Tasker. Firewall disabled!</string>
+	<string name="search_name">البحث التطبيق</string>
+    <string name="profilenames">تعديل الأسماء الشخصي</string>
+    <string name="vpn_enabled">تم تمكين VPN الدعم</string>
+    <string name="vpn_disabled">تم تعطيل VPN الدعم</string>
+    <string name="vpn_title">VPN الدعم</string>
+    <string name="vpn">VPN</string>
+    
 </resources>

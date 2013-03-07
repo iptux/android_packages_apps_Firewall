@@ -60,7 +60,7 @@
     <string name="apply">Aplicar</string>
     <string name="discard">Descartar</string>
     <string name="help_dialog_text"><i>Autor: Rodrigo Zechin Rosauro and updated by Jason Tschohl</i>		\n<i><a href="http://github.com/skullone/android_firewall">http://github.com/skullone/android_firewall</a></i>		\n
-		\n<i>Android Firewall</i> é um aplicativo que utiliza o poderoso firewall <b>iptables</b> do Linux.
+		\n<i>Android Firewall v2.1.3</i> é um aplicativo que utiliza o poderoso firewall <b>iptables</b> do Linux.
 		Ele permite restringir o acesso de cada aplicativo Android à rede de dados.
 		\nEsta é a solução perfeita se você não possui um plano de dados ilimitado, ou apenas deseja economizar bateria.
 		\n
@@ -120,9 +120,24 @@
     <string name="notifications_title">Notification Support</string>
     <string name="enableLog_title">Enable Firewall Log</string>
     <string name="invert">Invert</string>
-    <string name="vpnsupport">VPN Support</string>
-    <string name="vpn_was_enabled">VPN Support foi habilitado</string>
-    <string name="vpn_was_disabled">VPN Support foi desativada</string>
-    <string name="vpn_title">VPN</string>
+    <string name="twofortyfouram_locale_breadcrumb_format">%1$s%2$s%3$s</string>
+    <string name="twofortyfouram_locale_breadcrumb_separator">" | "</string>
+    <string name="twofortyfouram_locale_menu_dontsave">Cancel</string>
+    <string name="twofortyfouram_locale_menu_help">Help</string>
+    <string name="twofortyfouram_locale_menu_save">Done</string>
+    <string name="tasker_name">Android Firewall - Tasker</string>
+    <string name="tasker_profile">Tasker has changed Android Firewall to the Default Profile</string>
+    <string name="tasker_profile1">Tasker has changed Android Firewall to Profile 1</string>
+    <string name="tasker_profile2">Tasker has changed Android Firewall to Profile 2</string>
+    <string name="tasker_profile3">Tasker has changed Android Firewall to Profile 3</string>
+    <string name="tasker_profile4">Tasker has changed Android Firewall to Profile 4</string>
+    <string name="tasker_profile5">Tasker has changed Android Firewall to Profile 5</string>
+    <string name="tasker_profile_disabled">Android Firewall profiles changed by Tasker. Firewall disabled!</string>
+    <string name="search_name">App Pesquisa</string>
+    <string name="profilenames">Edite nomes de perfil</string>
+    <string name="vpn_enabled">Suporte a VPN foi habilitado</string>
+    <string name="vpn_disabled">Suporte a VPN foi desabilitado</string>
+    <string name="vpn_title">Suporte VPN</string>
+    <string name="vpn">VPN</string>
 
 </resources>

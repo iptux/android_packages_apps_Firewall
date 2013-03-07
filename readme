@@ -1,7 +1,24 @@
 This is a fork of the Droidwall application.  The original code is located here:  http://codegoogle.com/p/droidwall/     My code is located here:  http://github.com/skullone/android_firewall
 
 Changelog: 
- 
+
+2.1.6 - Translation updates to French and Chinese. Fix for firewall log always showing empty on some devices.  
+		UI clean up.  Many options moved to Settings menu.  VPN/Roaming support now optional and disappear
+		if disabled.
+2.1.5 - Fix minor issue where checkboxes for VPN are not showing up when the app is re-opened.
+2.1.4 - Profile names now editable. Fix for NullPointerException. VPN support has been added. Many thanks to Ventz for all his work 
+		with it and randomly supplying me with the exact iptables rules needed to implement the functionality.
+		Updated the logging code.  Logs should hold more information now and not get over written as often.  Applying rules
+		on boot has been totally re-written.  Hopefully, this corrects any issues with rules applying on boot.  This also
+		corrected an issue with some devices on Android 2.x where the app would hang the first time you open it after a reboot.
+		Profiles now save changes made to them.  Do not forget to export your rules file though for safe keeping. XHDPI icons added.
+2.1.3 - App search.  Widget fixed. Issue where the firewall rules don't work when Mobile Data Limit  is 
+		being used has been fixed.
+2.1.2 - Tasker/Locale plugin support. 
+2.1.1 - Shell script replaced by proper SU binary support with SuperSU binary.  Thanks to Chainfire for a great product and his write up
+		"How-to su".  I chose SuperSU over Superuser because of Chainfires write up. In the end either SU versions
+		would have worked just fine.  Fixed issue where loading profiles through menu wouldn't properly set the spinner position.
+		Update to the French translation, Thanks Joffrey!
 2.1.0 - Save/Load Profiles functionality. Spinner option added to main screen for quick swap of profiles. Main menu totally revamped.
 		Invert option for WiFi/Data added for those who swap between Blacklist and Whitelist.  Roaming still left up to the user. 
 		Notifications no longer fire when an app is updated, only new installs get a notification.  Code cleanup.  Translation updates. 

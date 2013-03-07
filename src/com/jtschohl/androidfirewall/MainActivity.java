@@ -28,10 +28,12 @@ package com.jtschohl.androidfirewall;
 import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map.Entry;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -48,6 +50,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -58,13 +62,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -79,6 +86,7 @@ import com.jtschohl.androidfirewall.Api.DroidApp;
  * application
  */
 
+@SuppressLint("DefaultLocale")
 public class MainActivity extends Activity implements OnCheckedChangeListener,
 		OnClickListener {
 
@@ -86,11 +94,16 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 	private ListView listview = null;
 	/** indicates if the view has been modified and not yet saved */
 	private boolean dirty = false;
+	/**
+	 * variables for profile names
+	 */
+	private String[] profileposition;
 
 	/**
 	 * Variables for spinner
 	 */
 	private Spinner spinner;
+	public ArrayAdapter<String> adapter1;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -111,18 +124,41 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 		this.findViewById(R.id.label_data).setOnClickListener(this);
 		this.findViewById(R.id.label_wifi).setOnClickListener(this);
 		this.findViewById(R.id.label_roam).setOnClickListener(this);
+		this.findViewById(R.id.label_vpn).setOnClickListener(this);
 		this.findViewById(R.id.label_invert).setOnClickListener(this);
+
+		toggleVPNbutton();
+		toggleRoambutton();
+		
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
 
 		// create the spinner
 		spinner = (Spinner) findViewById(R.id.spinner);
+
+		// profile names for spinner
+		final List<String> profilestring = new ArrayList<String>();
+		profilestring.add(prefs.getString("default",
+				getString(R.string.defaultprofile)));
+		profilestring.add(prefs.getString("profile1",
+				getString(R.string.profile1)));
+		profilestring.add(prefs.getString("profile2",
+				getString(R.string.profile2)));
+		profilestring.add(prefs.getString("profile3",
+				getString(R.string.profile3)));
+		profilestring.add(prefs.getString("profile4",
+				getString(R.string.profile4)));
+		profilestring.add(prefs.getString("profile5",
+				getString(R.string.profile5)));
+		profileposition = profilestring
+				.toArray(new String[profilestring.size()]);
+
 		// adapter for spinner
-		ArrayAdapter<?> adapter = ArrayAdapter.createFromResource(
-				getApplicationContext(), R.array.profile,
-				android.R.layout.simple_spinner_dropdown_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adapter);
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
+		adapter1 = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_dropdown_item, profileposition);
+
+		adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner.setAdapter(adapter1);
 		spinner.setSelection(prefs.getInt("itemPosition", 0));
 		spinner.post(new Runnable() {
 			public void run() {
@@ -172,6 +208,21 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			}
 		});
 
+		/**
+		 * Search function
+		 */
+
+		final EditText filterText = (EditText) findViewById(R.id.search);
+		filterText.addTextChangedListener(filterTextWatcher);
+		filterText.post(new Runnable() {
+			@Override
+			public void run() {
+				filterText.requestFocus();
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(filterText, InputMethodManager.SHOW_IMPLICIT);
+			}
+		});
+
 		Api.assertBinaries(this, true);
 	}
 
@@ -197,6 +248,34 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 	protected void onPause() {
 		super.onPause();
 		this.listview.setAdapter(null);
+	}
+
+	/**
+	 * update spinner with changed profile names
+	 */
+	public void updateSpinner() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+		final List<String> profilestring = new ArrayList<String>();
+		profilestring.add(prefs.getString("default",
+				getString(R.string.defaultprofile)));
+		profilestring.add(prefs.getString("profile1",
+				getString(R.string.profile1)));
+		profilestring.add(prefs.getString("profile2",
+				getString(R.string.profile2)));
+		profilestring.add(prefs.getString("profile3",
+				getString(R.string.profile3)));
+		profilestring.add(prefs.getString("profile4",
+				getString(R.string.profile4)));
+		profilestring.add(prefs.getString("profile5",
+				getString(R.string.profile5)));
+		profileposition = profilestring
+				.toArray(new String[profilestring.size()]);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_dropdown_item, profileposition);
+		adapter.notifyDataSetChanged();
+		spinner.setAdapter(adapter);
+		spinner.setSelection(prefs.getInt("itemPosition", 0));
 	}
 
 	/**
@@ -239,6 +318,14 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 		resid = (Api.isEnabled(this) ? R.string.title_enabled
 				: R.string.title_disabled);
 		setTitle(res.getString(resid));
+	}
+
+	/**
+	 * refresh the spinner
+	 */
+	private void refreshSpinner() {
+		final SharedPreferences prefs = getSharedPreferences(Api.PREFS_NAME, 0);
+		spinner.setSelection(prefs.getInt("itemPosition", 0));
 	}
 
 	/**
@@ -344,23 +431,31 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 		return "";
 	}
 
-	/**
-	 * Toggle iptables log enabled/disabled
-	 */
-	private void toggleLogEnabled() {
-		final SharedPreferences prefs = getSharedPreferences(Api.PREFS_NAME, 0);
-		final boolean enabled = !prefs.getBoolean(Api.PREF_LOGENABLED, false);
-		final Editor editor = prefs.edit();
-		editor.putBoolean(Api.PREF_LOGENABLED, enabled);
-		editor.commit();
-		if (Api.isEnabled(this)) {
-			Api.applySavedIptablesRules(this, true);
+	private void toggleVPNbutton() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+		boolean vpnenabled = prefs.getBoolean("vpnenabled", false);
+		Button btn = (Button) findViewById(R.id.label_vpn);
+		if (vpnenabled) {
+			btn.setVisibility(View.VISIBLE);
+		} else {
+			btn.setVisibility(View.GONE);
 		}
-		Toast.makeText(
-				MainActivity.this,
-				(enabled ? R.string.log_was_enabled : R.string.log_was_disabled),
-				Toast.LENGTH_SHORT).show();
 	}
+	
+	private void toggleRoambutton() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+		boolean roamenabled = prefs.getBoolean("roamingenabled", false);
+		Button btn = (Button) findViewById(R.id.label_roam);
+		if (roamenabled) {
+			btn.setVisibility(View.VISIBLE);
+		} else {
+			btn.setVisibility(View.GONE);
+		}
+
+	}
+
 
 	/**
 	 * If the applications are cached, just show them, otherwise load and show
@@ -385,22 +480,41 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 					try {
 						progress.dismiss();
 					} catch (Exception ex) {
+						Log.d("Android Firewall - error in showorloadappllications",
+								ex.getMessage());
 					}
-					createListView();
+					createListView("");
 				}
 			}.execute();
 		} else {
 			// the applications are cached, just show the list
-			createListView();
+			createListView("");
 		}
 	}
 
 	/**
 	 * Show the list of applications
+	 * 
+	 * Thanks to Ukanth for the Search code so I didn't have to reinvent the
+	 * whell
+	 * 
 	 */
-	private void createListView() {
+	private void createListView(final String searching) {
 		this.dirty = false;
-		final DroidApp[] apps = Api.getApps(this);
+		List<DroidApp> namesearch = new ArrayList<DroidApp>();
+		final DroidApp[] appnames = Api.getApps(this);
+		if (!searching.equals("") && searching.length() > 0) {
+			for (DroidApp app : appnames) {
+				for (String str : app.names) {
+					if (str.contains(searching)
+							|| str.toLowerCase().contains(searching)) {
+						namesearch.add(app);
+					}
+				}
+			}
+		}
+		final DroidApp[] apps = namesearch.size() > 0 ? namesearch
+				.toArray(new DroidApp[namesearch.size()]) : appnames;
 		// Sort applications - selected first, then alphabetically
 		Arrays.sort(apps, new Comparator<DroidApp>() {
 			@Override
@@ -417,69 +531,95 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 				return 1;
 			}
 		});
-		final LayoutInflater inflater = getLayoutInflater();
-		ListAdapter adapter = new ArrayAdapter<DroidApp>(this,
-				R.layout.listitem, R.id.itemtext, apps) {
-			@Override
-			public View getView(final int position, View convertView,
-					ViewGroup parent) {
-				ListEntry entry;
-				if (convertView == null) {
-					// Inflate a new view
-					convertView = inflater.inflate(R.layout.listitem, parent,
-							false);
-					Log.d("Android Firewall", ">> inflate(" + convertView + ")");
-					entry = new ListEntry();
-					entry.box_wifi = (CheckBox) convertView
-							.findViewById(R.id.itemcheck_wifi);
-					entry.box_3g = (CheckBox) convertView
-							.findViewById(R.id.itemcheck_3g);
-					entry.box_roaming = (CheckBox) convertView
-							.findViewById(R.id.itemcheck_roam);
-					entry.text = (TextView) convertView
-							.findViewById(R.id.itemtext);
-					entry.icon = (ImageView) convertView
-							.findViewById(R.id.itemicon);
-					entry.box_wifi
-							.setOnCheckedChangeListener(MainActivity.this);
-					entry.box_3g.setOnCheckedChangeListener(MainActivity.this);
-					entry.box_roaming
-							.setOnCheckedChangeListener(MainActivity.this);
-					convertView.setTag(entry);
-				} else {
-					// Convert an existing view
-					entry = (ListEntry) convertView.getTag();
-					entry.box_wifi = (CheckBox) convertView
-							.findViewById(R.id.itemcheck_wifi);
-					entry.box_3g = (CheckBox) convertView
-							.findViewById(R.id.itemcheck_3g);
-					entry.box_roaming = (CheckBox) convertView
-							.findViewById(R.id.itemcheck_roam);
-				}
-				final DroidApp app = apps[position];
-				entry.app = app;
-				entry.text.setText(app.toString());
-				entry.icon.setImageDrawable(app.cached_icon);
-				if (!app.icon_loaded && app.appinfo != null) {
-					// this icon has not been loaded yet - load it on a
-					// separated thread
-					new LoadIconTask().execute(app, getPackageManager(),
-							convertView);
-				}
-				final CheckBox box_wifi = entry.box_wifi;
-				box_wifi.setTag(app);
-				box_wifi.setChecked(app.selected_wifi);
-				final CheckBox box_3g = entry.box_3g;
-				box_3g.setTag(app);
-				box_3g.setChecked(app.selected_3g);
-				final CheckBox box_roaming = entry.box_roaming;
-				box_roaming.setTag(app);
-				box_roaming.setChecked(app.selected_roaming);
-				return convertView;
-			}
-		};
-		this.listview.setAdapter(adapter);
+		try {
+			final LayoutInflater inflater = getLayoutInflater();
+			ListAdapter adapter = new ArrayAdapter<DroidApp>(this,
+					R.layout.listitem, R.id.itemtext, apps) {
+				SharedPreferences prefs = PreferenceManager
+						.getDefaultSharedPreferences(getApplicationContext());
+				boolean vpnenabled = prefs.getBoolean("vpnenabled", false);
+				boolean roamenabled = prefs.getBoolean("roamingenabled", false);
 
+				@Override
+				public View getView(final int position, View convertView,
+						ViewGroup parent) {
+					ListEntry entry;
+					if (convertView == null) {
+						// Inflate a new view
+						convertView = inflater.inflate(R.layout.listitem,
+								parent, false);
+						Log.d("Android Firewall", ">> inflate(" + convertView
+								+ ")");
+						entry = new ListEntry();
+						entry.box_wifi = (CheckBox) convertView
+								.findViewById(R.id.itemcheck_wifi);
+						entry.box_3g = (CheckBox) convertView
+								.findViewById(R.id.itemcheck_3g);
+						entry.box_roaming = (CheckBox) convertView
+								.findViewById(R.id.itemcheck_roam);
+						entry.box_vpn = (CheckBox) convertView
+								.findViewById(R.id.itemcheck_vpn);
+						if (vpnenabled) {
+							entry.box_vpn.setVisibility(View.VISIBLE);
+						}
+						if (roamenabled){
+							entry.box_roaming.setVisibility(View.VISIBLE);
+						}
+						entry.text = (TextView) convertView
+								.findViewById(R.id.itemtext);
+						entry.icon = (ImageView) convertView
+								.findViewById(R.id.itemicon);
+						entry.box_wifi
+								.setOnCheckedChangeListener(MainActivity.this);
+						entry.box_3g
+								.setOnCheckedChangeListener(MainActivity.this);
+						entry.box_roaming
+								.setOnCheckedChangeListener(MainActivity.this);
+						entry.box_vpn
+								.setOnCheckedChangeListener(MainActivity.this);
+						convertView.setTag(entry);
+					} else {
+						// Convert an existing view
+						entry = (ListEntry) convertView.getTag();
+						entry.box_wifi = (CheckBox) convertView
+								.findViewById(R.id.itemcheck_wifi);
+						entry.box_3g = (CheckBox) convertView
+								.findViewById(R.id.itemcheck_3g);
+						entry.box_roaming = (CheckBox) convertView
+								.findViewById(R.id.itemcheck_roam);
+						entry.box_vpn = (CheckBox) convertView
+								.findViewById(R.id.itemcheck_vpn);
+					}
+					final DroidApp app = apps[position];
+					entry.app = app;
+					entry.text.setText(app.toString());
+					entry.icon.setImageDrawable(app.cached_icon);
+					if (!app.icon_loaded && app.appinfo != null) {
+						// this icon has not been loaded yet - load it on a
+						// separated thread
+						new LoadIconTask().execute(app, getPackageManager(),
+								convertView);
+					}
+					final CheckBox box_wifi = entry.box_wifi;
+					box_wifi.setTag(app);
+					box_wifi.setChecked(app.selected_wifi);
+					final CheckBox box_3g = entry.box_3g;
+					box_3g.setTag(app);
+					box_3g.setChecked(app.selected_3g);
+					final CheckBox box_roaming = entry.box_roaming;
+					box_roaming.setTag(app);
+					box_roaming.setChecked(app.selected_roaming);
+					final CheckBox box_vpn = entry.box_vpn;
+					box_vpn.setTag(app);
+					box_vpn.setChecked(app.selected_vpn);
+					return convertView;
+				}
+			};
+			this.listview.setAdapter(adapter);
+		} catch (Exception e) {
+			Log.d("Null pointer on listview", e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -496,12 +636,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			return true;
 		case R.id.applyrules:
 			applyOrSaveRules();
-			return true;
-		case R.id.enableipv6:
-			disableOrEnableIPv6();
-			return true;
-		case R.id.enablelog:
-			toggleLogEnabled();
 			return true;
 		case R.id.exit:
 			finish();
@@ -531,9 +665,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 		case R.id.importrules:
 			importRules();
 			return true;
-		case R.id.notify:
-			toggleNotifications();
-			return true;
 		case R.id.managerulefiles:
 			manageRuleFiles();
 			return true;
@@ -542,6 +673,12 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			return true;
 		case R.id.loadprofile:
 			selectProfile();
+			return true;
+		case R.id.editprofilenames:
+			editProfileNames();
+			return true;
+		case R.id.usersettings:
+			userSettings();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -562,35 +699,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			item_apply.setTitle(R.string.applyrules);
 			item_onoff.setChecked(true);
 		}
-		final MenuItem item_onoff2 = menu.findItem(R.id.enableipv6);
-		final boolean ipv6enabled = Api.isIPv6Enabled(this);
-		if (!ipv6enabled) {
-			// item_onoff2.setTitle(R.string.ipv6_disabled);
-			item_onoff2.setChecked(false);
-		} else if (ipv6enabled) {
-			// item_onoff2.setTitle(R.string.ipv6_enabled);
-			item_onoff2.setChecked(true);
-		}
-		final MenuItem item_log = menu.findItem(R.id.enablelog);
-		final boolean logenabled = getSharedPreferences(Api.PREFS_NAME, 0)
-				.getBoolean(Api.PREF_LOGENABLED, false);
-		if (logenabled) {
-			// item_log.setTitle(R.string.log_enabled);
-			item_log.setChecked(true);
-		} else {
-			// item_log.setTitle(R.string.log_disabled);
-			item_log.setChecked(false);
-		}
-		final MenuItem item_notify = menu.findItem(R.id.notify);
-		final boolean notifyenabled = getSharedPreferences(Api.PREFS_NAME, 0)
-				.getBoolean(Api.PREF_NOTIFY, false);
-		if (notifyenabled) {
-			// item_notify.setTitle(R.string.notify_enabled);
-			item_notify.setChecked(true);
-		} else {
-			// item_notify.setTitle(R.string.notify_disabled);
-			item_notify.setChecked(false);
-		}
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -607,36 +715,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			purgeRules();
 		}
 		refreshHeader();
-	}
-
-	// enable or disable IPv6 support
-	private void disableOrEnableIPv6() {
-		final boolean ipv6enabled = !Api.isIPv6Enabled(this);
-		Log.d("Android Firewall", "Enabling IPv6: " + ipv6enabled);
-		Api.setIPv6Enabled(this, ipv6enabled);
-		if (ipv6enabled) {
-			applyOrSaveRules();
-		} else {
-			purgeIp6Rules();
-		}
-		refreshHeader();
-	}
-
-	/**
-	 * Enable or disable Notifications
-	 */
-
-	private void toggleNotifications() {
-		final SharedPreferences prefs = getSharedPreferences(Api.PREFS_NAME, 0);
-		final boolean enabled = !prefs.getBoolean(Api.PREF_NOTIFY, false);
-		final Editor editor = prefs.edit();
-		editor.putBoolean(Api.PREF_NOTIFY, enabled);
-		editor.commit();
-		Toast.makeText(
-				MainActivity.this,
-				(enabled ? R.string.notify_was_enabled
-						: R.string.notify_was_disabled), Toast.LENGTH_SHORT)
-				.show();
 	}
 
 	/**
@@ -796,7 +874,24 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 					"There is an error accessing the androidfirewall directory. Please export a rules file first.",
 					Toast.LENGTH_LONG).show();
 		}
+	}
 
+	/**
+	 * Edit profile names
+	 */
+	private void editProfileNames() {
+		Intent intent = new Intent();
+		intent.setClass(this, EditProfileNames.class);
+		startActivityForResult(intent, EDIT_PROFILE_REQUEST);
+	}
+	
+	/**
+	 * User Settings
+	 */
+	private void userSettings(){
+		Intent intent = new Intent();
+		intent.setClass(this, UserSettings.class);
+		startActivityForResult(intent, USER_SETTINGS_REQUEST);
 	}
 
 	// set Request Code for Rules Import
@@ -807,6 +902,10 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 	static final int MANAGE_RULES_REQUEST = 30;
 	// set Request Code for Profile loading
 	static final int LOAD_PROFILE_REQUEST = 40;
+	// set Request Code for Edit Profile Names
+	static final int EDIT_PROFILE_REQUEST = 50;
+	// set Request Code for User Settings
+	static final int USER_SETTINGS_REQUEST = 60;
 
 	// @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -843,11 +942,22 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			Api.applications = null;
 			showOrLoadApplications();
 			refreshHeader();
+			refreshSpinner();
 			if (Api.isEnabled(getApplicationContext())) {
 				Api.applyIptablesRules(getApplicationContext(), true);
 			} else {
 				Api.saveRules(getApplicationContext());
 			}
+		}
+		if (requestCode == EDIT_PROFILE_REQUEST && resultCode == RESULT_OK) {
+			updateSpinner();
+		}
+		if (requestCode == USER_SETTINGS_REQUEST && resultCode == RESULT_OK){
+			//Api.applications = null;
+			//showOrLoadApplications();
+			toggleVPNbutton();
+			toggleRoambutton();
+			applyOrSaveRules();
 		}
 		// for debugging purposes
 		// if (resultCode == RESULT_CANCELED)
@@ -966,6 +1076,9 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 						: R.string.saving_rules), true);
 		final Handler handler = new Handler() {
 			public void handleMessage(Message msg) {
+				SharedPreferences prefs = PreferenceManager
+						.getDefaultSharedPreferences(getApplicationContext());
+				int i;
 				try {
 					progress.dismiss();
 				} catch (Exception ex) {
@@ -977,6 +1090,25 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 						Toast.makeText(MainActivity.this,
 								R.string.rules_applied, Toast.LENGTH_SHORT)
 								.show();
+						i = prefs.getInt("itemPosition", 0);
+						if (i == 0) {
+							saveDefaultProfile();
+						}
+						if (i == 1) {
+							saveProfile1();
+						}
+						if (i == 2) {
+							saveProfile2();
+						}
+						if (i == 3) {
+							saveProfile3();
+						}
+						if (i == 4) {
+							saveProfile4();
+						}
+						if (i == 5) {
+							saveProfile5();
+						}
 					} else {
 						Log.d("Android Firewall",
 								"Failed - Disabling firewall.");
@@ -990,6 +1122,25 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 					Api.saveRules(MainActivity.this);
 					Toast.makeText(MainActivity.this, R.string.rules_saved,
 							Toast.LENGTH_SHORT).show();
+					i = prefs.getInt("itemPosition", 0);
+					if (i == 0) {
+						saveDefaultProfile();
+					}
+					if (i == 1) {
+						saveProfile1();
+					}
+					if (i == 2) {
+						saveProfile2();
+					}
+					if (i == 3) {
+						saveProfile3();
+					}
+					if (i == 4) {
+						saveProfile4();
+					}
+					if (i == 5) {
+						saveProfile5();
+					}
 				}
 				MainActivity.this.dirty = false;
 			}
@@ -1014,28 +1165,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 				if (!Api.hasRootAccess(MainActivity.this, true))
 					return;
 				if (Api.purgeIptables(MainActivity.this, true)) {
-					Toast.makeText(MainActivity.this, R.string.rules_deleted,
-							Toast.LENGTH_SHORT).show();
-				}
-			}
-		};
-		handler.sendEmptyMessageDelayed(0, 100);
-	}
-
-	private void purgeIp6Rules() {
-		final Resources res = getResources();
-		final ProgressDialog progress = ProgressDialog.show(this,
-				res.getString(R.string.working),
-				res.getString(R.string.deleting_rules), true);
-		final Handler handler = new Handler() {
-			public void handleMessage(Message msg) {
-				try {
-					progress.dismiss();
-				} catch (Exception ex) {
-				}
-				if (!Api.hasRootAccess(MainActivity.this, true))
-					return;
-				if (Api.purgeIp6tables(MainActivity.this, true)) {
 					Toast.makeText(MainActivity.this, R.string.rules_deleted,
 							Toast.LENGTH_SHORT).show();
 				}
@@ -1070,6 +1199,12 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 					this.dirty = true;
 				}
 				break;
+			case R.id.itemcheck_vpn:
+				if (app.selected_vpn != isChecked) {
+					app.selected_vpn = isChecked;
+					this.dirty = true;
+				}
+				break;
 			}
 		}
 	}
@@ -1094,6 +1229,9 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			break;
 		case R.id.label_invert:
 			invertApps();
+			break;
+		case R.id.label_vpn:
+			selectAllVpn();
 			break;
 		}
 	}
@@ -1143,6 +1281,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			app.selected_wifi = false;
 			app.selected_roaming = false;
 			app.selected_3g = false;
+			app.selected_vpn = false;
 			this.dirty = true;
 		}
 		adapter.notifyDataSetChanged();
@@ -1155,6 +1294,17 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			DroidApp app = (DroidApp) adapter.getItem(item);
 			app.selected_3g = !app.selected_3g;
 			app.selected_wifi = !app.selected_wifi;
+			this.dirty = true;
+		}
+		adapter.notifyDataSetChanged();
+	}
+
+	private void selectAllVpn() {
+		BaseAdapter adapter = (BaseAdapter) listview.getAdapter();
+		int count = adapter.getCount();
+		for (int item = 0; item < count; item++) {
+			DroidApp app = (DroidApp) adapter.getItem(item);
+			app.selected_vpn = true;
 			this.dirty = true;
 		}
 		adapter.notifyDataSetChanged();
@@ -1239,6 +1389,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 		private CheckBox box_wifi;
 		private CheckBox box_3g;
 		private CheckBox box_roaming;
+		private CheckBox box_vpn;
 		private TextView text;
 		private ImageView icon;
 		private DroidApp app;
@@ -1251,7 +1402,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 				Context.MODE_PRIVATE);
 		final Editor editRules = prefs.edit();
 		editRules.clear();
-
 		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
 			Object rule = entry.getValue();
 			String keys = entry.getKey();
@@ -1284,7 +1434,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 				Api.PREF_PROFILE1, Context.MODE_PRIVATE);
 		final Editor editRules = prefs.edit();
 		editRules.clear();
-
 		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
 			Object rule = entry.getValue();
 			String keys = entry.getKey();
@@ -1317,7 +1466,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 				Api.PREF_PROFILE2, Context.MODE_PRIVATE);
 		final Editor editRules = prefs.edit();
 		editRules.clear();
-
 		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
 			Object rule = entry.getValue();
 			String keys = entry.getKey();
@@ -1350,7 +1498,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 				Api.PREF_PROFILE3, Context.MODE_PRIVATE);
 		final Editor editRules = prefs.edit();
 		editRules.clear();
-
 		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
 			Object rule = entry.getValue();
 			String keys = entry.getKey();
@@ -1383,7 +1530,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 				Api.PREF_PROFILE4, Context.MODE_PRIVATE);
 		final Editor editRules = prefs.edit();
 		editRules.clear();
-
 		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
 			Object rule = entry.getValue();
 			String keys = entry.getKey();
@@ -1416,7 +1562,6 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 				Api.PREF_PROFILE5, Context.MODE_PRIVATE);
 		final Editor editRules = prefs.edit();
 		editRules.clear();
-
 		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
 			Object rule = entry.getValue();
 			String keys = entry.getKey();
@@ -1441,4 +1586,164 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			Api.saveRules(getApplicationContext());
 		}
 	}
+
+	private void saveDefaultProfile() {
+		SharedPreferences prefs2 = getSharedPreferences(Api.PREFS_NAME,
+				Context.MODE_PRIVATE);
+		final SharedPreferences prefs = getSharedPreferences(Api.PREF_PROFILE,
+				Context.MODE_PRIVATE);
+		final Editor editRules = prefs.edit();
+		editRules.clear();
+		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
+			Object rule = entry.getValue();
+			String keys = entry.getKey();
+			if (rule instanceof Boolean)
+				editRules.putBoolean(keys, ((Boolean) rule).booleanValue());
+			else if (rule instanceof Float)
+				editRules.putFloat(keys, ((Float) rule).floatValue());
+			else if (rule instanceof String)
+				editRules.putString(keys, ((String) rule));
+			else if (rule instanceof Long)
+				editRules.putLong(keys, ((Long) rule).longValue());
+			else if (rule instanceof Integer)
+				editRules.putInt(keys, ((Integer) rule).intValue());
+		}
+		editRules.commit();
+	}
+
+	private void saveProfile1() {
+		SharedPreferences prefs2 = getSharedPreferences(Api.PREFS_NAME,
+				Context.MODE_PRIVATE);
+		final SharedPreferences prefs = getSharedPreferences(Api.PREF_PROFILE1,
+				Context.MODE_PRIVATE);
+		final Editor editRules = prefs.edit();
+		editRules.clear();
+		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
+			Object rule = entry.getValue();
+			String keys = entry.getKey();
+			if (rule instanceof Boolean)
+				editRules.putBoolean(keys, ((Boolean) rule).booleanValue());
+			else if (rule instanceof Float)
+				editRules.putFloat(keys, ((Float) rule).floatValue());
+			else if (rule instanceof String)
+				editRules.putString(keys, ((String) rule));
+			else if (rule instanceof Long)
+				editRules.putLong(keys, ((Long) rule).longValue());
+			else if (rule instanceof Integer)
+				editRules.putInt(keys, ((Integer) rule).intValue());
+		}
+		editRules.commit();
+	}
+
+	private void saveProfile2() {
+		SharedPreferences prefs2 = getSharedPreferences(Api.PREFS_NAME,
+				Context.MODE_PRIVATE);
+		final SharedPreferences prefs = getSharedPreferences(Api.PREF_PROFILE2,
+				Context.MODE_PRIVATE);
+		final Editor editRules = prefs.edit();
+		editRules.clear();
+		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
+			Object rule = entry.getValue();
+			String keys = entry.getKey();
+			if (rule instanceof Boolean)
+				editRules.putBoolean(keys, ((Boolean) rule).booleanValue());
+			else if (rule instanceof Float)
+				editRules.putFloat(keys, ((Float) rule).floatValue());
+			else if (rule instanceof String)
+				editRules.putString(keys, ((String) rule));
+			else if (rule instanceof Long)
+				editRules.putLong(keys, ((Long) rule).longValue());
+			else if (rule instanceof Integer)
+				editRules.putInt(keys, ((Integer) rule).intValue());
+		}
+		editRules.commit();
+	}
+
+	private void saveProfile3() {
+		SharedPreferences prefs2 = getSharedPreferences(Api.PREFS_NAME,
+				Context.MODE_PRIVATE);
+		final SharedPreferences prefs = getSharedPreferences(Api.PREF_PROFILE3,
+				Context.MODE_PRIVATE);
+		final Editor editRules = prefs.edit();
+		editRules.clear();
+		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
+			Object rule = entry.getValue();
+			String keys = entry.getKey();
+			if (rule instanceof Boolean)
+				editRules.putBoolean(keys, ((Boolean) rule).booleanValue());
+			else if (rule instanceof Float)
+				editRules.putFloat(keys, ((Float) rule).floatValue());
+			else if (rule instanceof String)
+				editRules.putString(keys, ((String) rule));
+			else if (rule instanceof Long)
+				editRules.putLong(keys, ((Long) rule).longValue());
+			else if (rule instanceof Integer)
+				editRules.putInt(keys, ((Integer) rule).intValue());
+		}
+		editRules.commit();
+	}
+
+	private void saveProfile4() {
+		SharedPreferences prefs2 = getSharedPreferences(Api.PREFS_NAME,
+				Context.MODE_PRIVATE);
+		final SharedPreferences prefs = getSharedPreferences(Api.PREF_PROFILE4,
+				Context.MODE_PRIVATE);
+		final Editor editRules = prefs.edit();
+		editRules.clear();
+		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
+			Object rule = entry.getValue();
+			String keys = entry.getKey();
+			if (rule instanceof Boolean)
+				editRules.putBoolean(keys, ((Boolean) rule).booleanValue());
+			else if (rule instanceof Float)
+				editRules.putFloat(keys, ((Float) rule).floatValue());
+			else if (rule instanceof String)
+				editRules.putString(keys, ((String) rule));
+			else if (rule instanceof Long)
+				editRules.putLong(keys, ((Long) rule).longValue());
+			else if (rule instanceof Integer)
+				editRules.putInt(keys, ((Integer) rule).intValue());
+		}
+		editRules.commit();
+	}
+
+	private void saveProfile5() {
+		SharedPreferences prefs2 = getSharedPreferences(Api.PREFS_NAME,
+				Context.MODE_PRIVATE);
+		final SharedPreferences prefs = getSharedPreferences(Api.PREF_PROFILE5,
+				Context.MODE_PRIVATE);
+		final Editor editRules = prefs.edit();
+		editRules.clear();
+		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
+			Object rule = entry.getValue();
+			String keys = entry.getKey();
+			if (rule instanceof Boolean)
+				editRules.putBoolean(keys, ((Boolean) rule).booleanValue());
+			else if (rule instanceof Float)
+				editRules.putFloat(keys, ((Float) rule).floatValue());
+			else if (rule instanceof String)
+				editRules.putString(keys, ((String) rule));
+			else if (rule instanceof Long)
+				editRules.putLong(keys, ((Long) rule).longValue());
+			else if (rule instanceof Integer)
+				editRules.putInt(keys, ((Integer) rule).intValue());
+		}
+		editRules.commit();
+	}
+
+	private TextWatcher filterTextWatcher = new TextWatcher() {
+
+		public void afterTextChanged(Editable s) {
+			MainActivity.this.createListView(s.toString());
+		}
+
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
+		}
+
+		public void onTextChanged(CharSequence s, int start, int before,
+				int count) {
+			MainActivity.this.createListView(s.toString());
+		}
+	};
 }
