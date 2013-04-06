@@ -48,7 +48,7 @@
     <string name="toast_bin_installed">Android Firewall: Binary files wurden installiert!</string>
     <string name="toast_error_enabling">Android Firewall: Fehler beim Aktivieren der Firewall!</string>
     <string name="help_dialog_text"><i>Autor: Rodrigo Zechin Rosauro and updated by Jason Tschohl</i>﻿  ﻿  \n<i><a href="http://github.com/skullone/android_firewall">http://github.com/skullone/android_firewall</a></i>﻿  ﻿  \n
-﻿  ﻿  \n<i>Android Firewall v2.1.3</i>Benutzer Application für die starke <b>iptables</b> Linux Firewall.
+﻿  ﻿  \n<i>Android Firewall</i>Benutzer Application für die starke <b>iptables</b> Linux Firewall.
 ﻿  ﻿  Sie macht es möglich auszuwählen, welche Applicationen Zugriff auf das Internet haben.
 ﻿  ﻿  \nDas ist die perfekte Lösung, wenn du eine begrenzte Internetverbindung hast, oder den Akku schonen willst.
 ﻿  ﻿  \n
@@ -117,12 +117,6 @@
     <string name="twofortyfouram_locale_menu_help">Help</string>
     <string name="twofortyfouram_locale_menu_save">Done</string>
     <string name="tasker_name">Android Firewall - Tasker</string>
-    <string name="tasker_profile">Tasker has changed Android Firewall to the Default Profile</string>
-    <string name="tasker_profile1">Tasker has changed Android Firewall to Profile 1</string>
-    <string name="tasker_profile2">Tasker has changed Android Firewall to Profile 2</string>
-    <string name="tasker_profile3">Tasker has changed Android Firewall to Profile 3</string>
-    <string name="tasker_profile4">Tasker has changed Android Firewall to Profile 4</string>
-    <string name="tasker_profile5">Tasker has changed Android Firewall to Profile 5</string>
     <string name="tasker_profile_disabled">Android Firewall profiles changed by Tasker. Firewall disabled!</string>
     <string name="search_name">App Suche</string>
     <string name="profilenames">Profil bearbeiten Vornamen</string>
@@ -130,5 +124,23 @@
     <string name="vpn_disabled">VPN-Unterstützung deaktiviert wurde</string>
     <string name="vpn_title">VPN-Unterstützung</string>
     <string name="vpn">VPN</string>
+    <string name="roaming_title">Roaming Unterstützung</string>
+    <string name="usersettings">Einstellungen</string>
+    <string name="taskertoast_title">Tasker Benachrichtigungen</string>
+    <string name="ipv6_summary">Diese Einstellung aktiviert oder deaktiviert die IPv6-Unterstützung</string>
+    <string name="vpn_summary">TDiese Einstellung aktiviert oder deaktiviert VPN-Unterstützung</string>
+    <string name="roaming_summary">Diese Einstellung aktiviert oder deaktiviert Roaming-Netz-Unterstützung</string>
+    <string name="taskertoast_summary">Diese Einstellung aktiviert oder deaktiviert Tasker Benachrichtigung Pop-ups, wenn Profile geändert werden</string>
+    <string name="log_summary">Diese Einstellung aktiviert oder deaktiviert die Firewall Logs</string>
+    <string name="notification_summary">Diese Einstellung aktiviert oder deaktiviert Benachrichtigungen für neu installierte Anwendungen, die InternetZugriff erforderlich</string>
+    <string name="tasker_profile">Tasker hat das Profil durch Android Firewall verwendet verändert</string>
+    <string name="apply_setting_changes">Anwenden von Regeln für die Einstellungsänderung</string>
+    <string name="rules_export_successfully">Die Regeln wurden erfolgreich exportiert</string>
+    <string name="rules_import_successfully">Die Regeln wurden erfolgreich importiert</string>
+    <string name="no_rules_file">Dort ist ein Fehler beim Zugriff auf die androidfirewall Verzeichnis. Bitte exportieren Sie eine Datei rules ersten</string>
+    <string name="no_storage">Dort ist ein Fehler beim Zugriff auf die androidfirewall Verzeichnis. Bitte überprüfen Sie, dass Ihre SDcard montiert ist oder ein externes Speichergerät zugänglich ist.</string>
+    <string name="file_deleted">Die Datei wurde gelöscht.</string>
+    <string name="simplewidget">On/Off Widget</string>
+    <string name="statuswidget">Menu Widget</string>
 
 </resources>

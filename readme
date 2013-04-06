@@ -2,9 +2,14 @@ This is a fork of the Droidwall application.  The original code is located here:
 
 Changelog: 
 
+2.1.8 - Bug fixes for crashes and NullPointerExceptions.  Added old widget back in.  The widgets are identifiable by their icons.  Blue-Green is On/Off widget.
+		Blue is the new toggle widget.  Ability to choose your language has been added (more will be added in the future).  Tasker can now Enable/Disable the firewall.
+2.1.7 - Widget has been replaced with a more functional one since the original gave people way too many problems.
+		New notification icon in order to look more like traditional Android notifications.
 2.1.6 - Translation updates to French and Chinese. Fix for firewall log always showing empty on some devices.  
 		UI clean up.  Many options moved to Settings menu.  VPN/Roaming support now optional and disappear
-		if disabled.
+		if disabled.  Tasker notifications now optional. Profile name changes now appear in Tasker.
+		All settings are saved to the rules files.  
 2.1.5 - Fix minor issue where checkboxes for VPN are not showing up when the app is re-opened.
 2.1.4 - Profile names now editable. Fix for NullPointerException. VPN support has been added. Many thanks to Ventz for all his work 
 		with it and randomly supplying me with the exact iptables rules needed to implement the functionality.

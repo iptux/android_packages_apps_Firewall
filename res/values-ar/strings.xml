@@ -47,7 +47,7 @@
     <string name="toast_bin_installed">Android Firewall: تم تنصيب الملفات الثنائية!</string>
     <string name="toast_error_enabling">"Android Firewall: خطأ بتفعيل الجدار الناري!"</string>
     <string name="help_dialog_text"><i>المبرمج: Rodrigo Zechin Rosauro and updated by Jason Tschohl</i>		\n<i><a href="http://github.com/skullone/android_firewall">http://github.com/skullone/android_firewall</a></i>		\n
-		\n<i>Android Firewall v2.1.3- جدار ناري للاندرويد</i> هو واجهة أمامية لميزة <b>iptables</b> الجدار الناري لنظام لينوكس.
+		\n<i>Android Firewall- جدار ناري للاندرويد</i> هو واجهة أمامية لميزة <b>iptables</b> الجدار الناري لنظام لينوكس.
 		حيث يتيح لك التحكم بأي برنامج ترغب بالسماح له بالوصول للشبكة.
 		\nوهو الخيار الأمثل في حال كان لديك اشتراك انترنت محدود التحميل أو ترغب بزيادة عمر البطارية.
 		\n
@@ -113,12 +113,6 @@
     <string name="twofortyfouram_locale_menu_help">Help</string>
     <string name="twofortyfouram_locale_menu_save">Done</string>
     <string name="tasker_name">Android Firewall - Tasker</string>
-    <string name="tasker_profile">Tasker has changed Android Firewall to the Default Profile</string>
-    <string name="tasker_profile1">Tasker has changed Android Firewall to Profile 1</string>
-    <string name="tasker_profile2">Tasker has changed Android Firewall to Profile 2</string>
-    <string name="tasker_profile3">Tasker has changed Android Firewall to Profile 3</string>
-    <string name="tasker_profile4">Tasker has changed Android Firewall to Profile 4</string>
-    <string name="tasker_profile5">Tasker has changed Android Firewall to Profile 5</string>
     <string name="tasker_profile_disabled">Android Firewall profiles changed by Tasker. Firewall disabled!</string>
 	<string name="search_name">البحث التطبيق</string>
     <string name="profilenames">تعديل الأسماء الشخصي</string>
@@ -126,5 +120,23 @@
     <string name="vpn_disabled">تم تعطيل VPN الدعم</string>
     <string name="vpn_title">VPN الدعم</string>
     <string name="vpn">VPN</string>
+    <string name="roaming_title">التجوال الدعم</string>
+    <string name="usersettings">إعدادات</string>
+    <string name="taskertoast_title">التبليغات تاسكر</string>
+    <string name="ipv6_summary">هذا الإعداد تمكين أو تعطيل دعم IPv6</string>
+    <string name="vpn_summary">هذا الإعداد تمكين أو تعطيل دعم VPN</string>
+    <string name="roaming_summary">هذا الإعداد تمكين أو تعطيل دعم الشبكة التجوال</string>
+    <string name="taskertoast_summary">هذا الإعداد تمكين أو تعطيل تاسكر الإخطار النوافذ المنبثقة عندما يتم تغيير محات</string>
+    <string name="log_summary">هذا الإعداد تمكين أو تعطيل جدار حماية السجلات رسائل</string>
+    <string name="notification_summary">هذا الإعداد تمكين أو تعطيل الإخطارات لتقديم الطلبات المثبتة حديثا التي تحتاج الوصول إلى الإنترنت</string>
+    <string name="tasker_profile">قد تغيرت الملف الشخصى تاسكر المستخدمة من قبل جدار حماية الروبوت</string>
+    <string name="apply_setting_changes">تطبيق قواعد لوضع التغيير</string>
+    <string name="rules_export_successfully">The rules have been exported successfully</string>
+    <string name="rules_import_successfully">The rules have been imported successfully</string>
+    <string name="no_rules_file">There is an error accessing the androidfirewall directory. Please export a rules file first</string>
+    <string name="no_storage">There is an error accessing the androidfirewall directory. Please check that your SDcard is mounted or external storage is accessible.</string>
+    <string name="file_deleted">The file has been deleted.</string>
+    <string name="simplewidget">On/Off Widget</string>
+    <string name="statuswidget">Menu Widget</string>
     
 </resources>

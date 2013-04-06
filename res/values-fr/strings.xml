@@ -62,7 +62,7 @@
     <string name="apply">Appliquer</string>
     <string name="discard">Annuler</string>
     <string name="help_dialog_text"><i>Auteur: Jason Tschohl. Auteur Original: Rodrigo Zechin Rosauro</i>		\n<i><a href="http://github.com/skullone/android_firewall">http://github.com/skullone/android_firewall</a></i>		\n<i>Traduction FR: Joffrey Thibaut</i>		\n
-        \n<i>Android Firewall v2</i> est un fork de <i>DroidWall</i> utilisant <b>iptables</b>, le pare-feu surpuissant de Linux.
+        \n<i>Android Firewall</i> est un fork de <i>DroidWall</i> utilisant <b>iptables</b>, le pare-feu surpuissant de Linux.
         Android Firewall vous permet d\'empêcher vos applications d\'accèder à internet.
         \nC\'est la solution parfaite si vous n\'avez pas de forfait "internet illimité", ou si vous souhaitez juste que votre batterie dure plus longtemps.
         \n
@@ -74,7 +74,7 @@
         \n
         \n<b>Widget :</b>        \nPour activer ou désactiver facilement le pare-feu, ajoutez le widget Android Firewall sur votre écran d\'accueil.
         \n
-        \n<b>Journalisation du pare-feu :</b>        \nSi vous voulez voir les applications bloquées par Android Firewall, ouvrez le menu <b>Options</b> et sélectionnez -> <b>Activer la journalisation</b>.
+        \n<b>Journalisation du pare-feu :</b>        \nSi vous voulez voir les applications bloquées par Android Firewall, activez la règle dans le menu <b>Préférences</b>.
         \nAndroid Firewall enregistrera alors chaque application bloquée. Vous pouvez lire les journaux en ouvrant le menu <b>Options</b> et en sélectionnant -> <b>Voir les journaux</b>.
         \n
         \n<b>Vérrouillage par mot de passe :</b>        \nVous pouvez définir un mot de passe à saisir à l\'ouverture d\'Android Firewall, en sélectionnant dans les <b>Options</b> du menu -> <b>Définir un mot de passe</b>.
@@ -104,8 +104,8 @@
     <string name="rulesoptions">Gestion des règles</string>
     <string name="profilesoptions">Gestion des profils</string>
     <string name="ipv6_title">Support IPv6</string>
-    <string name="notifications_title">Activer les notifications</string>
-    <string name="enableLog_title"> Activer la journalisation</string>
+    <string name="notifications_title">Notifications du pare-feu</string>
+    <string name="enableLog_title">Journalisation du pare-feu</string>
     <string name="defaultprofile">Défaut</string>
     <string name="profile1">Profil 1</string>
     <string name="profile2">Profil 2</string>
@@ -130,12 +130,6 @@
     <string name="twofortyfouram_locale_menu_help">Aide</string>
     <string name="twofortyfouram_locale_menu_save">OK</string>
     <string name="tasker_name">Android Firewall - Tasker</string>
-    <string name="tasker_profile">Tasker a changé le Profil par Défaut d\'Android Firewall</string>
-    <string name="tasker_profile1">Tasker a changé le Profil 1 d\'Android Firewall</string>
-    <string name="tasker_profile2">Tasker a changé le Profil 2 d\'Android Firewall</string>
-    <string name="tasker_profile3">Tasker a changé le Profil 3 d\'Android Firewall</string>
-    <string name="tasker_profile4">Tasker a changé le Profil 4 d\'Android Firewall</string>
-    <string name="tasker_profile5">Tasker a changé le Profil 5 d\'Android Firewall</string>
     <string name="tasker_profile_disabled">Les profils d\'Android Firewall sont changés par Tasker. Firewall désactivé !</string>
     <string name="search_name">Rechercher Application</string>
     <string name="profilenames">Modifier le nom des profils</string>
@@ -143,5 +137,23 @@
     <string name="vpn_disabled">Le support VPN a été désactivé</string>
     <string name="vpn_title">Support VPN</string>
     <string name="vpn">VPN</string>
+    <string name="roaming_title">Support Mode Itinérant</string>
+    <string name="usersettings">Préférences</string>
+    <string name="taskertoast_title">Notifications Tasker</string>
+    <string name="ipv6_summary">Activer ou désactiver le support IPv6</string>
+    <string name="vpn_summary">Activer ou désactiver le support VPN</string>
+    <string name="roaming_summary">Activer ou désactiver le mode itinérant (réseau Roaming)</string>
+    <string name="taskertoast_summary">Activer ou désactiver les Pop-ups de notification Tasker quand les profils sont changés</string>
+    <string name="log_summary">Activer ou désactiver les journaux du pare-feu</string>
+    <string name="notification_summary">Activer ou désactiver les notifications pour les applications nouvellement installées qui nécessitent un accès au réseau</string>
+    <string name="tasker_profile">Tasker a changé le profil utilisé par Android Firewall</string>
+    <string name="apply_setting_changes">Application de la nouvelle règle</string>
+    <string name="rules_export_successfully">Les règles ont été exportées avec succès</string>
+    <string name="rules_import_successfully">Les règles ont été importées avec succès</string>
+    <string name="no_rules_file">Il ya une erreur en accédant au répertoire d\'Android Firewall. Exporter un fichier de règles en premier.</string>
+    <string name="no_storage">Il ya une erreur en accédant au répertoire d\'Android Firewall. Vérifiez que votre carte SD est montée ou que le disque externe est accessible.</string>
+    <string name="file_deleted">Le fichier a été supprimé.</string>
+    <string name="simplewidget">On/Off Widget</string>
+    <string name="statuswidget">Menu Widget</string>
 
 </resources>

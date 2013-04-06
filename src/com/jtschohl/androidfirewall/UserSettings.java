@@ -25,16 +25,13 @@ package com.jtschohl.androidfirewall;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.EditTextPreference;
-import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -44,12 +41,6 @@ public class UserSettings extends PreferenceActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.layout.user_settings);
-		/*PreferenceManager.setDefaultValues(UserSettings.this,
-				R.layout.user_settings, false);*/
-
-		for (int i = 0; i < getPreferenceScreen().getPreferenceCount(); i++) {
-			initSummary(getPreferenceScreen().getPreference(i));
-		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -70,21 +61,39 @@ public class UserSettings extends PreferenceActivity implements
 				.unregisterOnSharedPreferenceChangeListener(this);
 	}
 
-	@SuppressWarnings("deprecation")
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
-		updatePrefSummary(findPreference(key));
-		
+
+		boolean ipv6 = sharedPreferences.getBoolean("ipv6enabled", false);
 		if (key.equals("ipv6enabled")) {
-			boolean ipv6 = sharedPreferences.getBoolean("ipv6enabled", false);
-			if (ipv6){
-				//resultOk();
+			if (ipv6) {
+				toggleIPv6enabled();
 			} else {
 				purgeIp6Rules();
 			}
 		}
+		if (key.equals("logenabled")) {
+			toggleLogenabled();
+		}
+		if (key.equals("vpnsupport")) {
+			toggleVPNenabled();
+		}
+		if (key.equals("roamingsupport")) {
+			toggleRoamenabled();
+		}
+		if (key.equals("notifyenabled")) {
+			toggleNotifyenabled();
+		}
+		if (key.equals("taskertoastenabled")) {
+			toggleTaskerNotifyenabled();
+		}
+		if (key.equals("locale")){
+			Api.applications = null;
+			Intent intent = new Intent();
+			setResult(RESULT_OK, intent);
+		}
 	}
-	
+
 	private void purgeIp6Rules() {
 		final Resources res = getResources();
 		final ProgressDialog progress = ProgressDialog.show(this,
@@ -99,36 +108,84 @@ public class UserSettings extends PreferenceActivity implements
 				if (!Api.hasRootAccess(getApplicationContext(), true))
 					return;
 				if (Api.purgeIp6tables(getApplicationContext(), true)) {
-					Toast.makeText(getApplicationContext(), R.string.rules_deleted,
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(),
+							R.string.rules_deleted, Toast.LENGTH_SHORT).show();
 				}
 			}
 		};
 		handler.sendEmptyMessageDelayed(0, 100);
 	}
 
-	private void initSummary(Preference p) {
-		if (p instanceof PreferenceCategory) {
-			PreferenceCategory pCat = (PreferenceCategory) p;
-			for (int i = 0; i < pCat.getPreferenceCount(); i++) {
-				initSummary(pCat.getPreference(i));
-			}
-		} else {
-			updatePrefSummary(p);
+	/**
+	 * Toggle log on/off
+	 */
+	private void toggleLogenabled() {
+		final SharedPreferences prefs = getSharedPreferences(Api.PREFS_NAME, 0);
+		final boolean enabled = !prefs.getBoolean(Api.PREF_LOGENABLED, false);
+		final Editor editor = prefs.edit();
+		editor.putBoolean(Api.PREF_LOGENABLED, enabled);
+		editor.commit();
+		if (Api.isEnabled(this)) {
+			Api.applySavedIptablesRules(this, true);
 		}
-
 	}
 
-	private void updatePrefSummary(Preference p) {
-		if (p instanceof ListPreference) {
-			ListPreference listPref = (ListPreference) p;
-			p.setSummary(listPref.getEntry());
+	/**
+	 * Toggle ipv6 on/off
+	 */
+	private void toggleIPv6enabled() {
+		final SharedPreferences prefs = getSharedPreferences(Api.PREFS_NAME, 0);
+		final boolean enabled = !prefs.getBoolean(Api.PREF_IP6TABLES, false);
+		final Editor editor = prefs.edit();
+		editor.putBoolean(Api.PREF_IP6TABLES, enabled);
+		editor.commit();
+		if (Api.isEnabled(this)) {
+			Api.applySavedIptablesRules(this, true);
 		}
-		if (p instanceof EditTextPreference) {
-			EditTextPreference editTextPref = (EditTextPreference) p;
-			p.setSummary(editTextPref.getText());
-		}
+	}
 
+	/**
+	 * Toggle VPN support on/off
+	 */
+	private void toggleVPNenabled() {
+		final SharedPreferences prefs = getSharedPreferences(Api.PREFS_NAME, 0);
+		boolean vpnenabled = !prefs.getBoolean(Api.PREF_VPNENABLED, false);
+		final Editor editor = prefs.edit();
+		editor.putBoolean(Api.PREF_VPNENABLED, vpnenabled);
+		editor.commit();
+	}
+
+	/**
+	 * Toggle Roaming support on/off
+	 */
+	private void toggleRoamenabled() {
+		final SharedPreferences prefs = getSharedPreferences(Api.PREFS_NAME, 0);
+		boolean roamenabled = !prefs.getBoolean(Api.PREF_ROAMENABLED, false);
+		final Editor editor = prefs.edit();
+		editor.putBoolean(Api.PREF_ROAMENABLED, roamenabled);
+		editor.commit();
+	}
+
+	/**
+	 * Toggle Notification support on/off
+	 */
+	private void toggleNotifyenabled() {
+		final SharedPreferences prefs = getSharedPreferences(Api.PREFS_NAME, 0);
+		final boolean enabled = !prefs.getBoolean(Api.PREF_NOTIFY, false);
+		final Editor editor = prefs.edit();
+		editor.putBoolean(Api.PREF_NOTIFY, enabled);
+		editor.commit();
+	}
+
+	/**
+	 * Toggle Tasker Notification support on/off
+	 */
+	private void toggleTaskerNotifyenabled() {
+		final SharedPreferences prefs = getSharedPreferences(Api.PREFS_NAME, 0);
+		final boolean enabled = !prefs.getBoolean(Api.PREF_TASKERNOTIFY, false);
+		final Editor editor = prefs.edit();
+		editor.putBoolean(Api.PREF_TASKERNOTIFY, enabled);
+		editor.commit();
 	}
 
 	@Override

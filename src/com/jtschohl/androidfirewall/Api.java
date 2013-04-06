@@ -36,9 +36,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import eu.chainfire.libsuperuser.Shell;
+import eu.chainfire.libsuperuser.Shell.SU;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -49,6 +51,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -66,8 +69,6 @@ public final class Api {
 	public static final int SPECIAL_UID_ANY = -10;
 	/** special application UID used to indicate the Linux Kernel */
 	public static final int SPECIAL_UID_KERNEL = -11;
-	/** root script filename */
-	// private static final String SCRIPT_FILE = "androidfirewall.sh";
 
 	// Preferences
 	public static String PREFS_NAME = "AndroidFirewallPrefs";
@@ -90,10 +91,13 @@ public final class Api {
 	public static final String PREF_MODE = "BlockMode";
 	public static final String PREF_ENABLED = "Enabled";
 	public static final String PREF_VPNENABLED = "VpnEnabled";
+	public static final String PREF_ROAMENABLED = "RoamingEnabled";
 	public static final String PREF_LOGENABLED = "LogEnabled";
 	public static final String PREF_IP6TABLES = "IPv6Enabled";
 	public static final String PREF_REFRESH = "Enabled";
 	public static final String PREF_EXPORTNAME = "ExportName";
+	public static final String PREF_NOTIFY = "NotifyEnabled";
+	public static final String PREF_TASKERNOTIFY = "TaskerNotifyEnabled";
 
 	// Modes
 	public static final String MODE_WHITELIST = "whitelist";
@@ -119,8 +123,9 @@ public final class Api {
 
 	// Cached applications
 	public static DroidApp applications[] = null;
+
 	// Do we have root access?
-	private static boolean hasroot = false;
+	// private static boolean hasroot = false;
 
 	/**
 	 * Display a simple alert box
@@ -231,11 +236,12 @@ public final class Api {
 	 *            (depending on the working mode)
 	 * @param showErrors
 	 *            indicates if errors should be alerted
-	 *            
-	 *  Many thanks to Ventz for his independent work with the VPN rules and figuring out how to get
-	 *  the VPN functionality he wanted and then forwarding the rules to me to implement in the app.  
-	 *  Thank you sir, many times over!
-	 *  
+	 * 
+	 *            Many thanks to Ventz for his independent work with the VPN
+	 *            rules and figuring out how to get the VPN functionality he
+	 *            wanted and then forwarding the rules to me to implement in the
+	 *            app. Thank you sir, many times over!
+	 * 
 	 */
 
 	private static boolean applyIptablesRulesImpl(Context ctx,
@@ -251,17 +257,19 @@ public final class Api {
 				"vsnet+", "ccmni+", "usb+", "rmnet1+", "rmnet_sdio+",
 				"rmnet_sdio0+", "rmnet_sdio1+", "qmi+", "wwan0+", "svnet0+",
 				"rmnet0+", "cdma_rmnet+" };
-		final String ITFS_VPN[] = { "tun+", "tun0+" };
+		final String ITFS_VPN[] = { "tun+", "tun0+", "ppp+", "ppp0+" };
 		final SharedPreferences prefs = ctx.getSharedPreferences(PREFS_NAME, 0);
-		SharedPreferences prefs2 = PreferenceManager
-				.getDefaultSharedPreferences(ctx);
 		final boolean whitelist = prefs.getString(PREF_MODE, MODE_WHITELIST)
 				.equals(MODE_WHITELIST);
 		final boolean blacklist = !whitelist;
-		boolean logenabled = prefs2.getBoolean("logenabled", false);
-		boolean vpnenabled = prefs2.getBoolean("vpnenabled", false);
-		boolean roamenabled = prefs2.getBoolean("roamingenabled", false);
-		boolean ipv6enabled = prefs2.getBoolean("ipv6enabled", false);
+		final boolean logenabled = ctx.getSharedPreferences(PREFS_NAME, 0)
+				.getBoolean(PREF_LOGENABLED, false);
+		final boolean vpnenabled = ctx.getSharedPreferences(PREFS_NAME, 0)
+				.getBoolean(PREF_VPNENABLED, false);
+		final boolean roamenabled = ctx.getSharedPreferences(PREFS_NAME, 0)
+				.getBoolean(PREF_ROAMENABLED, false);
+		final boolean ipv6enabled = ctx.getSharedPreferences(PREFS_NAME, 0)
+				.getBoolean(PREF_IP6TABLES, false);
 		final boolean enabled = ctx.getSharedPreferences(PREFS_NAME, 0)
 				.getBoolean(PREF_ENABLED, false);
 		final String customScript = ctx.getSharedPreferences(Api.PREFS_NAME, 0)
@@ -297,7 +305,7 @@ public final class Api {
 			if (logenabled) {
 				script.append(""
 						+ "# Create the log and reject rules (ignore errors on the LOG target just in case it is not available)\n"
-						+ "$IPTABLES -A droidwall-reject -j LOG --log-prefix \"[Android Firewall] \" --log-level 4 --log-uid\n"
+						+ "$IPTABLES -A droidwall-reject -j LOG --log-prefix \"[AndroidFirewall] \" --log-level 4 --log-uid\n"
 						+ "$IPTABLES -A droidwall-reject -j REJECT || exit 29\n"
 						+ "");
 			} else {
@@ -488,7 +496,7 @@ public final class Api {
 					if (logenabled && ipv6enabled) {
 						script.append(""
 								+ "# Create the log and reject rules (ignore errors on the LOG target just in case it is not available)\n"
-								+ "$IP6TABLES -A droidwall-reject -j LOG --log-prefix \"[Android Firewall] \" --log-level 4 --log-uid\n"
+								+ "$IP6TABLES -A droidwall-reject -j LOG --log-prefix \"[AndroidFirewall] \" --log-level 4 --log-uid\n"
 								+ "$IP6TABLES -A droidwall-reject -j REJECT || exit 76\n"
 								+ "");
 					} else {
@@ -650,7 +658,7 @@ public final class Api {
 			code = runScriptAsRoot(ctx, script.toString(), res);
 			if (showErrors && code != 0) {
 				String msg = res.toString();
-				Log.e("DroidWall", msg);
+				Log.e("AndroidFirewall", msg);
 				// Remove unnecessary help message from output
 				if (msg.indexOf("\nTry `iptables -h' or 'iptables --help' for more information.") != -1) {
 					msg = msg
@@ -1016,7 +1024,7 @@ public final class Api {
 		try {
 			StringBuilder res = new StringBuilder();
 			int code = runScriptAsRoot(ctx, scriptHeader(ctx)
-					+ "dmesg | $GREP [Android Firewall]\n", res);
+					+ "dmesg | $GREP [AndroidFirewall]\n", res);
 			if (code != 0) {
 				if (res.length() == 0) {
 					res.append("Log is empty");
@@ -1034,7 +1042,7 @@ public final class Api {
 			final HashMap<Integer, LogInfo> map = new HashMap<Integer, LogInfo>();
 			LogInfo loginfo = null;
 			while ((line = r.readLine()) != null) {
-				if (line.indexOf("[DROIDWALL]") == -1)
+				if (line.indexOf("[AndroidFirewall]") == -1)
 					continue;
 				appid = unknownUID;
 				if (((start = line.indexOf("UID=")) != -1)
@@ -1102,6 +1110,19 @@ public final class Api {
 		} catch (Exception e) {
 			Log.d("Android Firewall - error showing the logs", e.getMessage());
 			alert(ctx, "error: " + e);
+		}
+	}
+
+	/**
+	 * Change user language
+	 */
+	public static void changeLanguage(Context context, String language) {
+		if (!"".equals(language)) {
+			Locale locale = new Locale(language);
+			Locale.setDefault(locale);
+			Configuration config = new Configuration();
+			config.locale = locale;
+			context.getResources().updateConfiguration(config, null);
 		}
 	}
 
@@ -1320,27 +1341,51 @@ public final class Api {
 	 *            indicates if errors should be alerted
 	 * @return boolean true if we have root
 	 */
-	public static boolean hasRootAccess(final Context ctx, boolean showErrors) {
-		if (hasroot)
-			return true;
-		final StringBuilder res = new StringBuilder();
-		try {
-			// Run an empty script just to check root access
-			if (runScriptAsRoot(ctx, "exit 0", res) == 0) {
-				hasroot = true;
-				return true;
+
+	public static boolean hasRootAccess(Context ctx, boolean showErrors) {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(ctx);
+		boolean rootaccess = prefs.getBoolean("superuser", false);
+
+		if (!rootaccess) {
+			try {
+				// Run an empty script just to check root access
+				int returnCode = new checkForRoot().execute(null, null).get();
+				if (returnCode == 0) {
+					rootaccess = true;
+					Editor edit = prefs.edit();
+					edit.putBoolean("superuser", true);
+					edit.commit();
+				} else {
+					if (showErrors) {
+						alert(ctx, ctx.getString(R.string.error_no_root));
+					}
+				}
+			} catch (Exception e) {
 			}
-		} catch (Exception e) {
-			Log.d("Android Firewall - No root access available", e.getMessage());
 		}
-		if (showErrors) {
-			alert(ctx,
-					"Could not acquire root access.\n"
-							+ "You need a rooted phone to run DroidWall.\n\n"
-							+ "If this phone is already rooted, please make sure DroidWall has enough permissions to execute the \"su\" command.\n"
-							+ "Error message: " + res.toString());
+		return rootaccess;
+	}
+
+	private static class checkForRoot extends
+			AsyncTask<Object, Object, Integer> {
+		private int exitCode = -1;
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
 		}
-		return false;
+
+		@Override
+		protected Integer doInBackground(Object... params) {
+			try {
+				if (SU.available())
+					exitCode = 0;
+			} catch (Exception ex) {
+			}
+			return exitCode;
+		}
+
 	}
 
 	/**
@@ -1431,26 +1476,6 @@ public final class Api {
 	}
 
 	/**
-	 * check to see if IPv6 is enabled
-	 */
-	public static boolean isIPv6Enabled(Context ctx) {
-		if (ctx == null)
-			return false;
-		return ctx.getSharedPreferences(PREFS_NAME, 0).getBoolean(
-				PREF_IP6TABLES, false);
-	}
-
-	/**
-	 * check to see if VPN support is enabled
-	 */
-	public static boolean vpnEnabled(Context ctx) {
-		if (ctx == null)
-			return false;
-		return ctx.getSharedPreferences(PREFS_NAME, 0).getBoolean(
-				PREF_VPNENABLED, false);
-	}
-
-	/**
 	 * determines if data connection is roaming
 	 */
 	public static boolean isRoaming(Context context) {
@@ -1495,11 +1520,11 @@ public final class Api {
 		if (ctx == null)
 			return;
 		final SharedPreferences prefs = ctx.getSharedPreferences(PREFS_NAME, 0);
-		if (prefs.getBoolean(PREF_IP6TABLES, false) == ipv6enabled) {
+		if (prefs.getBoolean("ipv6enabled", false) == ipv6enabled) {
 			return;
 		}
 		final Editor edit = prefs.edit();
-		edit.putBoolean(PREF_IP6TABLES, ipv6enabled);
+		edit.putBoolean("ipv6enabled", ipv6enabled);
 		if (!edit.commit()) {
 			alert(ctx, "Error writing to preferences!");
 			return;

@@ -60,7 +60,7 @@
     <string name="apply">Aplicar</string>
     <string name="discard">Descartar</string>
     <string name="help_dialog_text"><i>Autor: Rodrigo Zechin Rosauro and updated by Jason Tschohl</i>		\n<i><a href="http://github.com/skullone/android_firewall">http://github.com/skullone/android_firewall</a></i>		\n
-		\n<i>Android Firewall v2.1.3</i> é um aplicativo que utiliza o poderoso firewall <b>iptables</b> do Linux.
+		\n<i>Android Firewall</i> é um aplicativo que utiliza o poderoso firewall <b>iptables</b> do Linux.
 		Ele permite restringir o acesso de cada aplicativo Android à rede de dados.
 		\nEsta é a solução perfeita se você não possui um plano de dados ilimitado, ou apenas deseja economizar bateria.
 		\n
@@ -126,12 +126,6 @@
     <string name="twofortyfouram_locale_menu_help">Help</string>
     <string name="twofortyfouram_locale_menu_save">Done</string>
     <string name="tasker_name">Android Firewall - Tasker</string>
-    <string name="tasker_profile">Tasker has changed Android Firewall to the Default Profile</string>
-    <string name="tasker_profile1">Tasker has changed Android Firewall to Profile 1</string>
-    <string name="tasker_profile2">Tasker has changed Android Firewall to Profile 2</string>
-    <string name="tasker_profile3">Tasker has changed Android Firewall to Profile 3</string>
-    <string name="tasker_profile4">Tasker has changed Android Firewall to Profile 4</string>
-    <string name="tasker_profile5">Tasker has changed Android Firewall to Profile 5</string>
     <string name="tasker_profile_disabled">Android Firewall profiles changed by Tasker. Firewall disabled!</string>
     <string name="search_name">App Pesquisa</string>
     <string name="profilenames">Edite nomes de perfil</string>
@@ -139,5 +133,23 @@
     <string name="vpn_disabled">Suporte a VPN foi desabilitado</string>
     <string name="vpn_title">Suporte VPN</string>
     <string name="vpn">VPN</string>
+    <string name="roaming_title">Roaming de Suporte</string>
+    <string name="usersettings">configurações</string>
+    <string name="taskertoast_title">Notificações Tasker</string>
+    <string name="ipv6_summary">Esta configuração habilita ou desabilita o suporte a IPv6</string>
+    <string name="vpn_summary">Esta configuração ativa ou desativa o suporte VPN</string>
+    <string name="roaming_summary">Esta configuração habilita ou desabilita Roaming suporte de rede</string>
+    <string name="taskertoast_summary">Esta configuração habilita ou desabilita Tasker notificação pop-ups quando os perfis são alteradas</string>
+    <string name="log_summary">Esta configuração habilita ou desabilita os logs de firewall</string>
+    <string name="notification_summary">Esta configuração habilita ou desabilita notificações para aplicativos recém-instalados que precisam de acesso à Internet</string>
+    <string name="tasker_profile">Tasker mudou o perfil que está sendo usado por Android Firewall</string>
+    <string name="apply_setting_changes">Aplicação de regras para definir mudanças</string>
+    <string name="rules_export_successfully">As regras foram exportados com sucesso</string>
+    <string name="rules_import_successfully">As regras foram importadas com sucesso</string>
+    <string name="no_rules_file">Há um erro ao acessar o diretório androidfirewall. Por favor, exportar um arquivo de regras primeiro</string>
+    <string name="no_storage">Há um erro ao acessar o diretório androidfirewall. Verifique se o seu SDcard é montado ou armazenamento externo está acessível.</string>
+    <string name="file_deleted">O arquivo de foi apagado.</string>
+    <string name="simplewidget">On/Off Widget</string>
+    <string name="statuswidget">Menu Widget</string>
 
 </resources>

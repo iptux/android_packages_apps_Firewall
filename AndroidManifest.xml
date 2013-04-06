@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.jtschohl.androidfirewall"
-    android:versionCode="216"
-    android:versionName="2.1.6" >
+    android:versionCode="218"
+    android:versionName="2.1.8" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -53,6 +53,13 @@
         <activity android:name=".LoadProfile" />
         <activity android:name=".EditProfileNames" />
         <activity android:name=".UserSettings" />
+        <activity
+            android:name=".WidgetActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
 
         <service android:name="com.jtschohl.androidfirewall.setRulesOnBootService" >
         </service>
@@ -62,6 +69,10 @@
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" >
+                </action>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_MOUNTED" >
                 </action>
             </intent-filter>
         </receiver>
@@ -78,10 +89,25 @@
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
-        <receiver android:name="StatusWidget" >
+        <receiver
+            android:name="StatusWidget"
+            android:label="@string/statuswidget" >
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/onoff_widget" />
+
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.jtschohl.androidfirewall.intent.action.STATUS_CHANGED" />
+                <action android:name="com.jtschohl.androidfirewall.intent.action.TOGGLE_REQUEST" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="SimpleWidget"
+            android:label="@string/simplewidget" >
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/simplewidget" />
 
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

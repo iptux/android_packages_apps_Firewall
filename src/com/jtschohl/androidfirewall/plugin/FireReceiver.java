@@ -29,6 +29,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -52,6 +54,15 @@ public final class FireReceiver extends BroadcastReceiver {
 		 * Always be strict on input parameters! A malicious third-party app
 		 * could send a malformed Intent.
 		 */
+
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				if (msg.arg1 != 0)
+					Toast.makeText(context, msg.arg1, Toast.LENGTH_SHORT)
+							.show();
+			}
+		};
+		final Message msg = new Message();
 
 		if (!com.twofortyfouram.locale.Intent.ACTION_FIRE_SETTING.equals(intent
 				.getAction())) {
@@ -96,6 +107,48 @@ public final class FireReceiver extends BroadcastReceiver {
 			editor.commit();
 			LoadProfile5(context);
 		}
+		if (i == 6) {
+			boolean toastenabled = context.getSharedPreferences(Api.PREFS_NAME,
+					0).getBoolean(Api.PREF_TASKERNOTIFY, false);
+			if (Api.applySavedIptablesRules(context, false)) {
+				if (toastenabled) {
+					msg.arg1 = R.string.toast_enabled;
+					handler.sendMessage(msg);
+				}
+				Api.setEnabled(context, true);
+			} else {
+				if (toastenabled) {
+					msg.arg1 = R.string.toast_error_enabling;
+					handler.sendMessage(msg);
+				}
+			}
+		}
+		if (i == 7) {
+			final SharedPreferences prefs2 = context.getSharedPreferences(
+					Api.PREFS_NAME, 0);
+			boolean toastenabled = context.getSharedPreferences(Api.PREFS_NAME,
+					0).getBoolean(Api.PREF_TASKERNOTIFY, false);
+			final String oldPwd = prefs2.getString(Api.PREF_PASSWORD, "");
+			final String newPwd = context.getSharedPreferences(Api.PREFS_NAME,
+					0).getString("validationPassword", "");
+			if (oldPwd.length() == 0 && newPwd.length() == 0) {
+				if (Api.purgeIptables(context, false)) {
+					if (toastenabled) {
+						msg.arg1 = R.string.toast_disabled;
+						handler.sendMessage(msg);
+					}
+					Api.setEnabled(context, false);
+				} else {
+					if (toastenabled) {
+						msg.arg1 = R.string.toast_error_disabling;
+						handler.sendMessage(msg);
+					}
+				}
+			} else {
+				msg.arg1 = R.string.widget_fail;
+				handler.sendMessage(msg);
+			}
+		}
 	}
 
 	private void LoadDefaultProfile(Context context) {
@@ -103,6 +156,8 @@ public final class FireReceiver extends BroadcastReceiver {
 				Context.MODE_PRIVATE);
 		final SharedPreferences prefs2 = context.getSharedPreferences(
 				Api.PREF_PROFILE, Context.MODE_PRIVATE);
+		boolean toastenabled = context.getSharedPreferences(Api.PREFS_NAME, 0)
+				.getBoolean(Api.PREF_TASKERNOTIFY, false);
 		final Editor editRules = prefs.edit();
 		editRules.clear();
 		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
@@ -121,15 +176,20 @@ public final class FireReceiver extends BroadcastReceiver {
 		}
 		editRules.commit();
 		Api.applications = null;
+		toggleUserSettings(context);
 		if (Api.isEnabled(context)) {
 			Api.applyIptablesRules(context, true);
-			Toast.makeText(context, R.string.tasker_profile, Toast.LENGTH_LONG)
-					.show();
+			if (toastenabled) {
+				Toast.makeText(context, R.string.tasker_profile,
+						Toast.LENGTH_LONG).show();
+			}
 		} else {
 			Api.saveRules(context);
 			Api.purgeIptables(context, true);
-			Toast.makeText(context, R.string.tasker_profile_disabled,
-					Toast.LENGTH_LONG).show();
+			if (toastenabled) {
+				Toast.makeText(context, R.string.tasker_profile_disabled,
+						Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 
@@ -138,6 +198,8 @@ public final class FireReceiver extends BroadcastReceiver {
 				Context.MODE_PRIVATE);
 		final SharedPreferences prefs2 = context.getSharedPreferences(
 				Api.PREF_PROFILE1, Context.MODE_PRIVATE);
+		boolean toastenabled = context.getSharedPreferences(Api.PREFS_NAME, 0)
+				.getBoolean(Api.PREF_TASKERNOTIFY, false);
 		final Editor editRules = prefs.edit();
 		editRules.clear();
 		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
@@ -156,15 +218,20 @@ public final class FireReceiver extends BroadcastReceiver {
 		}
 		editRules.commit();
 		Api.applications = null;
+		toggleUserSettings(context);
 		if (Api.isEnabled(context)) {
 			Api.applyIptablesRules(context, true);
-			Toast.makeText(context, R.string.tasker_profile1, Toast.LENGTH_LONG)
-					.show();
+			if (toastenabled) {
+				Toast.makeText(context, R.string.tasker_profile,
+						Toast.LENGTH_LONG).show();
+			}
 		} else {
 			Api.saveRules(context);
 			Api.purgeIptables(context, true);
-			Toast.makeText(context, R.string.tasker_profile_disabled,
-					Toast.LENGTH_LONG).show();
+			if (toastenabled) {
+				Toast.makeText(context, R.string.tasker_profile_disabled,
+						Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 
@@ -173,6 +240,8 @@ public final class FireReceiver extends BroadcastReceiver {
 				Context.MODE_PRIVATE);
 		final SharedPreferences prefs2 = context.getSharedPreferences(
 				Api.PREF_PROFILE2, Context.MODE_PRIVATE);
+		boolean toastenabled = context.getSharedPreferences(Api.PREFS_NAME, 0)
+				.getBoolean(Api.PREF_TASKERNOTIFY, false);
 		final Editor editRules = prefs.edit();
 		editRules.clear();
 		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
@@ -191,15 +260,20 @@ public final class FireReceiver extends BroadcastReceiver {
 		}
 		editRules.commit();
 		Api.applications = null;
+		toggleUserSettings(context);
 		if (Api.isEnabled(context)) {
 			Api.applyIptablesRules(context, true);
-			Toast.makeText(context, R.string.tasker_profile2, Toast.LENGTH_LONG)
-					.show();
+			if (toastenabled) {
+				Toast.makeText(context, R.string.tasker_profile,
+						Toast.LENGTH_LONG).show();
+			}
 		} else {
 			Api.saveRules(context);
 			Api.purgeIptables(context, true);
-			Toast.makeText(context, R.string.tasker_profile_disabled,
-					Toast.LENGTH_LONG).show();
+			if (toastenabled) {
+				Toast.makeText(context, R.string.tasker_profile_disabled,
+						Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 
@@ -208,6 +282,8 @@ public final class FireReceiver extends BroadcastReceiver {
 				Context.MODE_PRIVATE);
 		final SharedPreferences prefs2 = context.getSharedPreferences(
 				Api.PREF_PROFILE3, Context.MODE_PRIVATE);
+		boolean toastenabled = context.getSharedPreferences(Api.PREFS_NAME, 0)
+				.getBoolean(Api.PREF_TASKERNOTIFY, false);
 		final Editor editRules = prefs.edit();
 		editRules.clear();
 		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
@@ -226,15 +302,20 @@ public final class FireReceiver extends BroadcastReceiver {
 		}
 		editRules.commit();
 		Api.applications = null;
+		toggleUserSettings(context);
 		if (Api.isEnabled(context)) {
 			Api.applyIptablesRules(context, true);
-			Toast.makeText(context, R.string.tasker_profile3, Toast.LENGTH_LONG)
-					.show();
+			if (toastenabled) {
+				Toast.makeText(context, R.string.tasker_profile,
+						Toast.LENGTH_LONG).show();
+			}
 		} else {
 			Api.saveRules(context);
 			Api.purgeIptables(context, true);
-			Toast.makeText(context, R.string.tasker_profile_disabled,
-					Toast.LENGTH_LONG).show();
+			if (toastenabled) {
+				Toast.makeText(context, R.string.tasker_profile_disabled,
+						Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 
@@ -243,6 +324,8 @@ public final class FireReceiver extends BroadcastReceiver {
 				Context.MODE_PRIVATE);
 		final SharedPreferences prefs2 = context.getSharedPreferences(
 				Api.PREF_PROFILE4, Context.MODE_PRIVATE);
+		boolean toastenabled = context.getSharedPreferences(Api.PREFS_NAME, 0)
+				.getBoolean(Api.PREF_TASKERNOTIFY, false);
 		final Editor editRules = prefs.edit();
 		editRules.clear();
 		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
@@ -261,15 +344,20 @@ public final class FireReceiver extends BroadcastReceiver {
 		}
 		editRules.commit();
 		Api.applications = null;
+		toggleUserSettings(context);
 		if (Api.isEnabled(context)) {
 			Api.applyIptablesRules(context, true);
-			Toast.makeText(context, R.string.tasker_profile4, Toast.LENGTH_LONG)
-					.show();
+			if (toastenabled) {
+				Toast.makeText(context, R.string.tasker_profile,
+						Toast.LENGTH_LONG).show();
+			}
 		} else {
 			Api.saveRules(context);
 			Api.purgeIptables(context, true);
-			Toast.makeText(context, R.string.tasker_profile_disabled,
-					Toast.LENGTH_LONG).show();
+			if (toastenabled) {
+				Toast.makeText(context, R.string.tasker_profile_disabled,
+						Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 
@@ -278,6 +366,8 @@ public final class FireReceiver extends BroadcastReceiver {
 				Context.MODE_PRIVATE);
 		final SharedPreferences prefs2 = context.getSharedPreferences(
 				Api.PREF_PROFILE5, Context.MODE_PRIVATE);
+		boolean toastenabled = context.getSharedPreferences(Api.PREFS_NAME, 0)
+				.getBoolean(Api.PREF_TASKERNOTIFY, false);
 		final Editor editRules = prefs.edit();
 		editRules.clear();
 		for (Entry<String, ?> entry : prefs2.getAll().entrySet()) {
@@ -296,15 +386,62 @@ public final class FireReceiver extends BroadcastReceiver {
 		}
 		editRules.commit();
 		Api.applications = null;
+		toggleUserSettings(context);
 		if (Api.isEnabled(context)) {
 			Api.applyIptablesRules(context, true);
-			Toast.makeText(context, R.string.tasker_profile5, Toast.LENGTH_LONG)
-					.show();
+			if (toastenabled) {
+				Toast.makeText(context, R.string.tasker_profile,
+						Toast.LENGTH_LONG).show();
+			}
 		} else {
 			Api.saveRules(context);
 			Api.purgeIptables(context, true);
-			Toast.makeText(context, R.string.tasker_profile_disabled,
-					Toast.LENGTH_LONG).show();
+			if (toastenabled) {
+				Toast.makeText(context, R.string.tasker_profile_disabled,
+						Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+
+	private void toggleUserSettings(Context ctx) {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(ctx);
+		SharedPreferences.Editor editor = prefs.edit();
+		boolean ipv6support = ctx.getSharedPreferences(Api.PREFS_NAME, 0)
+				.getBoolean(Api.PREF_IP6TABLES, false);
+		boolean logsupport = ctx.getSharedPreferences(Api.PREFS_NAME, 0)
+				.getBoolean(Api.PREF_LOGENABLED, false);
+		boolean notifysupport = ctx.getSharedPreferences(Api.PREFS_NAME, 0)
+				.getBoolean(Api.PREF_NOTIFY, false);
+		boolean taskerenabled = ctx.getSharedPreferences(Api.PREFS_NAME, 0)
+				.getBoolean(Api.PREF_TASKERNOTIFY, false);
+		if (ipv6support) {
+			editor.putBoolean("ipv6enabled", true);
+			editor.commit();
+		} else {
+			editor.putBoolean("ipv6enabled", false);
+			editor.commit();
+		}
+		if (logsupport) {
+			editor.putBoolean("logenabled", true);
+			editor.commit();
+		} else {
+			editor.putBoolean("logenabled", false);
+			editor.commit();
+		}
+		if (notifysupport) {
+			editor.putBoolean("notifyenabled", true);
+			editor.commit();
+		} else {
+			editor.putBoolean("notifyenabled", false);
+			editor.commit();
+		}
+		if (taskerenabled) {
+			editor.putBoolean("taskertoastenabled", true);
+			editor.commit();
+		} else {
+			editor.putBoolean("taskertoastenabled", false);
+			editor.commit();
 		}
 	}
 }
