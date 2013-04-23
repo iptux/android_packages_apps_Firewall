@@ -484,6 +484,8 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 				.getBoolean(Api.PREF_NOTIFY, false);
 		boolean taskerenabled = ctx.getSharedPreferences(Api.PREFS_NAME, 0)
 				.getBoolean(Api.PREF_TASKERNOTIFY, false);
+		boolean sdcard = ctx.getSharedPreferences(Api.PREFS_NAME, 0)
+				.getBoolean(Api.PREF_SDCARD, false);
 		if (ipv6support) {
 			editor.putBoolean("ipv6enabled", true);
 			editor.commit();
@@ -510,6 +512,13 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 			editor.commit();
 		} else {
 			editor.putBoolean("taskertoastenabled", false);
+			editor.commit();
+		}
+		if (sdcard) {
+			editor.putBoolean("sdcard", true);
+			editor.commit();
+		} else {
+			editor.putBoolean("sdcard", false);
 			editor.commit();
 		}
 	}
@@ -561,11 +570,12 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 		this.dirty = false;
 		List<DroidApp> namesearch = new ArrayList<DroidApp>();
 		final DroidApp[] appnames = Api.getApps(this);
-		if (!searching.equals("") && searching.length() > 0) {
+		if (searching != null && searching.length() > 1) {
 			for (DroidApp app : appnames) {
 				for (String str : app.names) {
-					if (str.contains(searching)
-							|| str.toLowerCase().contains(searching)) {
+					if (str.contains(searching.toLowerCase())
+							|| str.toLowerCase().contains(
+									searching.toLowerCase())) {
 						namesearch.add(app);
 					}
 				}
@@ -1070,42 +1080,18 @@ public class MainActivity extends Activity implements OnCheckedChangeListener,
 	 * Show iptable rules on a dialog
 	 */
 	private void showRules() {
-		final Resources res = getResources();
-		final ProgressDialog progress = ProgressDialog.show(this,
-				res.getString(R.string.working),
-				res.getString(R.string.please_wait), true);
-		final Handler handler = new Handler() {
-			public void handleMessage(Message msg) {
-				try {
-					progress.dismiss();
-				} catch (Exception ex) {
-				}
-				if (!Api.hasRootAccess(MainActivity.this, true))
-					return;
-				Api.showIptablesRules(MainActivity.this);
-			}
-		};
-		handler.sendEmptyMessageDelayed(0, 100);
+		Intent intent = new Intent();
+		intent.setClass(this, showRules.class);
+		startActivityForResult(intent, 0);
 	}
 
 	/**
 	 * Show logs on a dialog
 	 */
 	private void showLog() {
-		final Resources res = getResources();
-		final ProgressDialog progress = ProgressDialog.show(this,
-				res.getString(R.string.working),
-				res.getString(R.string.please_wait), true);
-		final Handler handler = new Handler() {
-			public void handleMessage(Message msg) {
-				try {
-					progress.dismiss();
-				} catch (Exception ex) {
-				}
-				Api.showLog(MainActivity.this);
-			}
-		};
-		handler.sendEmptyMessageDelayed(0, 100);
+		Intent intent = new Intent();
+		intent.setClass(this, showLog.class);
+		startActivityForResult(intent, 0);
 	}
 
 	/**

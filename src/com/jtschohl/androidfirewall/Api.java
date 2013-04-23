@@ -44,7 +44,6 @@ import eu.chainfire.libsuperuser.Shell.SU;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -98,6 +97,7 @@ public final class Api {
 	public static final String PREF_EXPORTNAME = "ExportName";
 	public static final String PREF_NOTIFY = "NotifyEnabled";
 	public static final String PREF_TASKERNOTIFY = "TaskerNotifyEnabled";
+	public static final String PREF_SDCARD = "SDCard";
 
 	// Modes
 	public static final String MODE_WHITELIST = "whitelist";
@@ -137,9 +137,7 @@ public final class Api {
 	 */
 	public static void alert(Context ctx, CharSequence msg) {
 		if (ctx != null) {
-			new AlertDialog.Builder(ctx)
-					.setNeutralButton(android.R.string.ok, null)
-					.setMessage(msg).show();
+			Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -382,6 +380,7 @@ public final class Api {
 					}
 				}
 			}
+			script.append("$IPTABLES -I droidwall-3g -m owner --uid-owner 9999 -j RETURN || exit 9999\n");
 			if (any_wifi) {
 				if (blacklist) {
 					/* block any application on this interface */
@@ -570,6 +569,7 @@ public final class Api {
 						}
 					}
 				}
+				script.append("$IP6TABLES -I droidwall-3g -m owner --uid-owner 9999 -j RETURN || exit 9999\n");
 				if (any_wifi && ipv6enabled) {
 					if (blacklist) {
 						// block any application on this interface
@@ -977,17 +977,37 @@ public final class Api {
 	 * @param ctx
 	 *            application context
 	 */
-	public static void showIptablesRules(Context ctx) {
+	public static String showIptablesRules(Context ctx) {
+		final boolean ipv6enabled = ctx.getSharedPreferences(PREFS_NAME, 0)
+				.getBoolean(PREF_IP6TABLES, false);
+		final boolean enabled = ctx.getSharedPreferences(PREFS_NAME, 0)
+				.getBoolean(PREF_ENABLED, false);
 		try {
-			final StringBuilder res = new StringBuilder();
-			runScriptAsRoot(ctx, scriptHeader(ctx) + "$ECHO $IPTABLES\n" +
-			// "$IP6TABLES -L -v -n\n" +
-					"$IPTABLES -L -v -n\n", res);
-			alert(ctx, res);
+			if (enabled && ipv6enabled) {
+				final StringBuilder res = new StringBuilder();
+				runScriptAsRoot(ctx, scriptHeader(ctx) + "$ECHO $IPTABLES\n"
+						+ "$IPTABLES -L -v -n\n" 
+						+ "***Start of IPv6 rules***\n"
+						+ "$IP6TABLES -L -v -n\n", res);
+				return res.toString();
+			}
+			if (enabled) {
+				final StringBuilder res = new StringBuilder();
+				runScriptAsRoot(ctx, scriptHeader(ctx) + "$ECHO $IPTABLES\n"
+						+ "$IPTABLES -L -v -n\n", res);
+				return res.toString();
+			}
+			if (!enabled) {
+				final StringBuilder res = new StringBuilder();
+				runScriptAsRoot(ctx, scriptHeader(ctx) + "$ECHO $IPTABLES\n"
+						+ "$IPTABLES -L -v -n\n", res);
+				return res.toString();
+			}
 		} catch (Exception e) {
-			Log.d("Android Firewall - error show rules", e.getMessage());
+			Log.d("Android Firewall - error showing rules", e.getMessage());
 			alert(ctx, "error: " + e);
 		}
+		return "";
 	}
 
 	/**
@@ -1020,17 +1040,17 @@ public final class Api {
 	 * @param ctx
 	 *            application context
 	 */
-	public static void showLog(Context ctx) {
+	public static String showLog(Context ctx) {
 		try {
 			StringBuilder res = new StringBuilder();
+			StringBuilder output = new StringBuilder();
 			int code = runScriptAsRoot(ctx, scriptHeader(ctx)
 					+ "dmesg | $GREP [AndroidFirewall]\n", res);
 			if (code != 0) {
 				if (res.length() == 0) {
-					res.append("Log is empty");
+					output.append(ctx.getString(R.string.log_empty));
 				}
-				alert(ctx, res);
-				return;
+				return output.toString();
 			}
 			final BufferedReader r = new BufferedReader(new StringReader(
 					res.toString()));
@@ -1104,13 +1124,14 @@ public final class Api {
 				res.append("\n\n");
 			}
 			if (res.length() == 0) {
-				res.append("Log is empty");
+				res.append(ctx.getString(R.string.log_empty));
 			}
-			alert(ctx, res);
+			return res.toString();
 		} catch (Exception e) {
 			Log.d("Android Firewall - error showing the logs", e.getMessage());
 			alert(ctx, "error: " + e);
 		}
+		return "";
 	}
 
 	/**
@@ -1130,12 +1151,12 @@ public final class Api {
 			locale = new Locale(language);
 		}
 
-		//if (!"".equals(language)) {
-		//	Locale.setDefault(locale);
-			Configuration config = new Configuration();
-			config.locale = locale;
-			context.getResources().updateConfiguration(config, null);
-		//}
+		// if (!"".equals(language)) {
+		// Locale.setDefault(locale);
+		Configuration config = new Configuration();
+		config.locale = locale;
+		context.getResources().updateConfiguration(config, null);
+		// }
 	}
 
 	/**
